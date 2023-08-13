@@ -1,5 +1,5 @@
-import { defaultHandSize, defaultDeck } from "./defaults";
-import { Card, CardSlot, ActivePlayer, Player } from "./statics";
+import { defaultHandSize, defaultDeck } from './defaults';
+import { Card, CardSlot, ActivePlayer, Player } from './statics';
 
 export class Game {
     cards: Card[];
@@ -28,11 +28,11 @@ export class Game {
     }
 }
 
-function shuffle<element extends any>(array: element[]) {
+function shuffle<element>(array: element[]) {
     let currentIndex = array.length
 
     // While there remain elements to shuffle.
-    while (currentIndex != 0) {
+    while (currentIndex !== 0) {
 
         // Pick a remaining element.
         let randomIndex = Math.floor(Math.random() * currentIndex);
