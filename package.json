@@ -3,11 +3,16 @@
   "version": "0.0.0",
   "description": "A simulation of the dutch game \"beverbende\" used for statistics",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "npx tsc",
+    "install": "npm i",
+    "start": "node dist/."
+  },
   "author": "Oscar",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
-    "eslint": "^8.47.0"
+    "eslint": "^8.47.0",
+    "typescript": "^5.1.6"
   }
 }
