@@ -1,0 +1,10 @@
+{
+  "name": "beverbende",
+  "version": "0.0.0",
+  "description": "A simulation of the dutch game \"beverbende\" used for statistics",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Oscar",
+  "license": "ISC",
+  "type": "module"
+}
