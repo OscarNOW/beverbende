@@ -62,6 +62,8 @@ export class ActivePlayer {
     }
 }
 
+type extendsWithout<extending, without> = extending extends without ? never : extending;
+
 export type action<performer extends ActivePlayer, drawnCard extends Card> =
     drawnCard extends ActionCard ?
     drawnCard['action'] extends 'switch' ? {
@@ -70,7 +72,7 @@ export type action<performer extends ActivePlayer, drawnCard extends Card> =
         drawnCardLocation: 'dispose';
 
         ownCardSlot: CardSlot<performer>;
-        otherCardSlot: CardSlot<ActivePlayer>; //todo: make sure this ActivePlayer isn't performer
+        otherCardSlot: CardSlot<extendsWithout<ActivePlayer, performer>>; // makes sure otherCardSlot isn't a cardSlot of performer. //todo: test if this works
     } :
     drawnCard['action'] extends 'look' ? {
         performer: performer;
