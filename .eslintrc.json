@@ -5,9 +5,6 @@
     "ignorePatterns": [
         "dist/**/*.*"
     ],
-    "extends": [
-        "plugin:@typescript-eslint/recommended"
-    ],
     "parser": "@typescript-eslint/parser",
     "plugins": [
         "@typescript-eslint"
@@ -15,7 +12,8 @@
     "root": true,
     "parserOptions": {
         "ecmaVersion": "latest",
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": true
     },
     "rules": {
         "no-undef": "error",
@@ -55,6 +53,7 @@
         "no-unreachable": "warn",
         "eqeqeq": "warn",
         "no-extra-boolean-cast": "warn",
+        "@typescript-eslint/no-unnecessary-type-constraint": "warn",
         "arrow-parens": [
             "warn",
             "as-needed"
