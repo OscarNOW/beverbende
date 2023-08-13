@@ -8,6 +8,10 @@
         "outDir": "dist"
     },
     "lib": [
-        "es2019"
+        "es2017",
+        "es2019",
+        "ES6",
+        "esnext",
+        "esnext.array"
     ]
 }
