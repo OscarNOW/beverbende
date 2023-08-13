@@ -20,6 +20,7 @@ export type Card = ActionCard | ValueCard;
 
 export class CardSlot<owner extends ActivePlayer> {
     private currentCard: Card;
+    previousCards: Card[];
 
     activePlayer: owner;
     handIndex: number;
@@ -28,6 +29,8 @@ export class CardSlot<owner extends ActivePlayer> {
         this.currentCard = currentCard;
         this.activePlayer = activePlayer;
         this.handIndex = handIndex;
+
+        this.previousCards = [];
     };
 
     dispose() { };//todo
@@ -43,26 +46,30 @@ export class Player {
     performAction: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
             previousActions: action<ActivePlayer, Card>[],
-            privateInformation: activePlayer['privateInformation'], //todo: fix that this is private
+            privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
             drawnCard: drawnCard
         ) =>
-        action<activePlayer, drawnCard>;
+        newAction<activePlayer, drawnCard>;
 
     declareLastRound: <activePlayer extends ActivePlayer>
         (
             previousActions: action<ActivePlayer, Card>[],
-            privateInformation: activePlayer['privateInformation'] //todo: fix that this is private
+            privateInformation: privateInformation<activePlayer['privateInformationKeys']>
         ) =>
         boolean;
 }
+
+type privateInformation<includingKeys extends string[]> = {
+    // eslint-disable-next-line no-unused-vars
+    [privateInformationId in keyof includingKeys]: Card; //todo: test if this works
+};
 
 export class ActivePlayer {
     player: Player;
     hand: CardSlot<this>[];
 
-    private privateInformation: {
-        [privateInformationId: string]: Card;
-    }
+    private privateInformation: privateInformation<this['privateInformationKeys']>;
+    privateInformationKeys: string[];
 
     constructor(player: Player) {
         this.player = player;
@@ -82,6 +89,7 @@ export type action<performer extends ActivePlayer, drawnCard extends Card> =
         performer: performer;
         type: 'switch';
         drawnCardLocation: 'dispose';
+        drawnCard: drawnCard;
 
         ownCardSlot: CardSlot<performer>;
         otherCardSlot: CardSlot<extendsWithout<ActivePlayer, performer>>; // makes sure otherCardSlot isn't a cardSlot of performer. //todo: test if this works
@@ -90,13 +98,16 @@ export type action<performer extends ActivePlayer, drawnCard extends Card> =
         performer: performer;
         type: 'look';
         drawnCardLocation: 'dispose';
+        drawnCard: drawnCard;
 
-        cardSlot: CardSlot<performer>; //todo: implement a way so the ActivePlayer can actually see the card
+        cardSlot: CardSlot<performer>;
+        privateInformationId: keyof performer['privateInformationKeys']
     } :
     drawnCard['action'] extends 'extraDraw' ? {
         performer: performer;
         type: 'extraDraw';
         drawnCardLocation: 'dispose';
+        drawnCard: drawnCard;
 
         //todo
     } :
@@ -106,16 +117,18 @@ export type action<performer extends ActivePlayer, drawnCard extends Card> =
         performer: performer;
         type: 'dispose';
         drawnCardLocation: 'dispose';
-
-        card: drawnCard;
+        drawnCard: drawnCard;
     } |
     {
         performer: performer;
         type: 'use';
         drawnCardLocation: 'hand';
+        disposedCard: Card;
 
         cardSlot: CardSlot<performer>;
-
-        //todo: add way of seeing disposed card
     } :
     never;
+
+type newAction<performer extends ActivePlayer, drawnCard extends Card> =
+    Omit<action<performer, drawnCard>,
+        'privateInformationId' | 'disposedCard'>; //todo: test if Omit works
