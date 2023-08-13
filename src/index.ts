@@ -24,7 +24,7 @@ export class Game {
             this.activePlayers.push(activePlayer);
         }
 
-        //todo: implement a way so the player can see the two outer cards
+        //todo: implement a way so the player can see the two outer cards with privateInformation
     }
 }
 

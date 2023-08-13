@@ -33,7 +33,7 @@ export class CardSlot<owner extends ActivePlayer> {
         this.previousCards = [];
     };
 
-    dispose() { };//todo
+    dispose() { };//todo-imp: implement and (is this even needed)
 }
 
 export class Player {
@@ -109,7 +109,7 @@ export type action<performer extends ActivePlayer, drawnCard extends Card> =
         drawnCardLocation: 'dispose';
         drawnCard: drawnCard;
 
-        //todo
+        //todo-imp: implement
     } :
     never :
     drawnCard extends ValueCard ?
