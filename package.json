@@ -4,7 +4,7 @@
   "description": "A simulation of the dutch game \"beverbende\" used for statistics",
   "main": "dist/.",
   "scripts": {
-    "do": "npx ts-node .",
+    "do": "npx ts-node ./",
     "build": "npx tsc",
     "install": "npm i",
     "start": "node dist/."
