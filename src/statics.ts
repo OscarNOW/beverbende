@@ -40,17 +40,29 @@ export class Player {
         this.name = name;
     }
 
-    performAction: <drawnCard extends Card, activePlayer extends ActivePlayer>
+    performAction: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
             previousActions: action<ActivePlayer, Card>[],
+            privateInformation: activePlayer['privateInformation'], //todo: fix that this is private
             drawnCard: drawnCard
         ) =>
         action<activePlayer, drawnCard>;
+
+    declareLastRound: <activePlayer extends ActivePlayer>
+        (
+            previousActions: action<ActivePlayer, Card>[],
+            privateInformation: activePlayer['privateInformation'] //todo: fix that this is private
+        ) =>
+        boolean;
 }
 
 export class ActivePlayer {
     player: Player;
     hand: CardSlot<this>[];
+
+    private privateInformation: {
+        [privateInformationId: string]: Card;
+    }
 
     constructor(player: Player) {
         this.player = player;
