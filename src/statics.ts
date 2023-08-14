@@ -1,22 +1,22 @@
-export type actionCard = 'switch' | 'look' | 'extraDraw';
-export class ActionCard {
-    action: actionCard;
+export type actionCardAction = 'switch' | 'look' | 'extraDraw';
+export class ActionCard<thisAction extends actionCardAction> {
+    action: thisAction;
     isActionCard: true;
 
-    constructor(action: actionCard) {
+    constructor(action: thisAction) {
         this.action = action;
     }
 }
 
-export class ValueCard {
-    value: number;
+export class ValueCard<value extends number> {
+    value: value;
     isActionCard: false;
 
-    constructor(value: number) {
+    constructor(value: value) {
         this.value = value;
     }
 }
-export type Card = ActionCard | ValueCard;
+export type Card = ActionCard<actionCardAction> | ValueCard<number>;
 
 export class CardSlot<owner extends ActivePlayer> {
     private currentCard: Card;
@@ -33,7 +33,14 @@ export class CardSlot<owner extends ActivePlayer> {
         this.previousCards = [];
     };
 
-    dispose() { };//todo-imp: implement and (is this even needed)
+    replace(newCard: Card): Card {
+        const oldCard = this.currentCard;
+
+        this.previousCards.push(oldCard);
+        this.currentCard = newCard;
+
+        return oldCard;
+    };
 }
 
 export class Player {
@@ -45,16 +52,25 @@ export class Player {
 
     performAction: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
-            previousActions: action<ActivePlayer, Card>[],
+            previousActions: action<ActivePlayer, Card, true>[],
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
             drawnCard: drawnCard
         ) =>
-        newAction<activePlayer, drawnCard>;
+        action<activePlayer, drawnCard, true, 'new'>;
 
     declareLastRound: <activePlayer extends ActivePlayer>
         (
-            previousActions: action<ActivePlayer, Card>[],
+            previousActions: action<ActivePlayer, Card, true>[],
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>
+        ) =>
+        boolean;
+
+    acceptExtraDrawCard: <activePlayer extends ActivePlayer, drawnCard extends Card>
+        (
+            previousActions: action<ActivePlayer, Card, true>[],
+            currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true>, //todo: make this partial
+            privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+            drawnCard: drawnCard
         ) =>
         boolean;
 }
@@ -82,53 +98,126 @@ export class ActivePlayer {
 }
 
 type extendsWithout<extending, without> = extending extends without ? never : extending;
+type typeIsSpecific<type, values> = values extends type ? false : true;
 
-export type action<performer extends ActivePlayer, drawnCard extends Card> =
-    drawnCard extends ActionCard ?
-    drawnCard['action'] extends 'switch' ? {
-        performer: performer;
-        type: 'switch';
-        drawnCardLocation: 'dispose';
-        drawnCard: drawnCard;
+type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeValueCard extends boolean, stage extends 'finished' | 'current' | 'new'> =
+    drawnCard extends ActionCard<actionCardAction> ?
+    (
+        typeIsSpecific<drawnCard['action'], actionCardAction> extends false ?
+        (
+            {
+                performer: performer;
+                type: 'switch';
+                drawnCardLocation: 'dispose';
+                drawnCard: drawnCard;
 
-        ownCardSlot: CardSlot<performer>;
-        otherCardSlot: CardSlot<extendsWithout<ActivePlayer, performer>>; // makes sure otherCardSlot isn't a cardSlot of performer. //todo: test if this works
-    } :
-    drawnCard['action'] extends 'look' ? {
-        performer: performer;
-        type: 'look';
-        drawnCardLocation: 'dispose';
-        drawnCard: drawnCard;
+                ownCardSlot: CardSlot<performer>;
+                otherCardSlot: CardSlot<extendsWithout<ActivePlayer, performer>>; // makes sure otherCardSlot isn't a cardSlot of performer. //todo: test if this works
+            } | {
+                performer: performer;
+                type: 'look';
+                drawnCardLocation: 'dispose';
+                drawnCard: drawnCard;
 
-        cardSlot: CardSlot<performer>;
-        privateInformationId: keyof performer['privateInformationKeys']
-    } :
-    drawnCard['action'] extends 'extraDraw' ? {
-        performer: performer;
-        type: 'extraDraw';
-        drawnCardLocation: 'dispose';
-        drawnCard: drawnCard;
+                cardSlot: CardSlot<performer>;
+                privateInformationId: stage extends 'new' ? never : keyof performer['privateInformationKeys'] //todo: test if never works here
+            } | {
+                performer: performer;
+                type: 'extraDraw';
+                drawnCardLocation: 'dispose';
+                drawnCard: drawnCard;
 
-        //todo-imp: implement
-    } :
-    never :
-    drawnCard extends ValueCard ?
-    {
-        performer: performer;
-        type: 'dispose';
-        drawnCardLocation: 'dispose';
-        drawnCard: drawnCard;
-    } |
-    {
-        performer: performer;
-        type: 'use';
-        drawnCardLocation: 'hand';
-        disposedCard: Card;
+                actions: [
+                    {
+                        accepted: true;
+                        action: action<performer, Card, false>;
+                    }
+                ] | [
+                    {
+                        accepted: false;
+                        action: {
+                            performer: performer;
+                            type: 'dispose';
+                            drawnCardLocation: 'dispose';
+                            drawnCard: drawnCard;
+                        }
+                    },
+                    {
+                        accepted: true;
+                        action: action<performer, Card, true>;
+                    }
+                ]
+            }
+        ) :
+        drawnCard['action'] extends 'switch' ? {
+            performer: performer;
+            type: 'switch';
+            drawnCardLocation: 'dispose';
+            drawnCard: drawnCard;
 
-        cardSlot: CardSlot<performer>;
-    } :
-    never;
+            ownCardSlot: CardSlot<performer>;
+            otherCardSlot: CardSlot<extendsWithout<ActivePlayer, performer>>; // makes sure otherCardSlot isn't a cardSlot of performer. //todo: test if this works
+        } :
+        drawnCard['action'] extends 'look' ? {
+            performer: performer;
+            type: 'look';
+            drawnCardLocation: 'dispose';
+            drawnCard: drawnCard;
 
-type newAction<performer extends ActivePlayer, drawnCard extends Card> =
-    Omit<action<performer, drawnCard>,
-        'privateInformationId' | 'disposedCard'>; //todo: test if Omit works
+            cardSlot: CardSlot<performer>;
+            privateInformationId: keyof performer['privateInformationKeys']
+        } :
+        drawnCard['action'] extends 'extraDraw' ? {
+            performer: performer;
+            type: 'extraDraw';
+            drawnCardLocation: 'dispose';
+            drawnCard: drawnCard;
+
+            actions: [ //todo: use stage here
+                {
+                    accepted: true;
+                    action: action<performer, Card, false>;
+                }
+            ] | [
+                {
+                    accepted: false;
+                    action: {
+                        performer: performer;
+                        type: 'dispose';
+                        drawnCardLocation: 'dispose';
+                        drawnCard: drawnCard;
+                    }
+                },
+                {
+                    accepted: true;
+                    action: action<performer, Card, true>;
+                }
+            ]
+        } : never
+    ) :
+    drawnCard extends ValueCard<number> ?
+    (
+        canDisposeValueCard extends false ?
+        {
+            performer: performer;
+            type: 'use';
+            drawnCardLocation: 'hand';
+            disposedCard: stage extends 'new' ? never : Card; //todo: test if never works here
+        } :
+        (
+            {
+                performer: performer;
+                type: 'dispose';
+                drawnCardLocation: 'dispose';
+                drawnCard: drawnCard;
+            } |
+            {
+                performer: performer;
+                type: 'use';
+                drawnCardLocation: 'hand';
+                disposedCard: stage extends 'new' ? never : Card; //todo: test if never works here
+
+                cardSlot: CardSlot<performer>;
+            }
+        )
+    ) : never;
