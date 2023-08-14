@@ -182,32 +182,32 @@ export type action<performer extends ActivePlayer, drawnCard extends Card, canDi
             drawnCard: drawnCard;
 
             actions:
-            stage extends 'new' ? never : //todo: test if never works here
-            (stage extends 'current' ? [] : never) | //todo: test if never works here
-            [
-                {
-                    accepted: true;
-                    action: action<performer, Card, false, stage>;
-                }
-            ] | [
-                {
-                    accepted: false;
-                    action: disposeAction<performer, drawnCard>
-                },
-                {
-                    accepted: true;
-                    action: action<performer, Card, true, stage>;
-                }
-            ] | [
-                {
-                    accepted: false;
-                    action: disposeAction<performer, drawnCard>
-                },
-                {
-                    accepted: false;
-                    action: action<performer, Card, true, stage>;
-                }
-            ]
+            stage extends 'new' ? [] : ( //todo: test if never works here
+                (stage extends 'current' ? [] : never) | //todo: test if never works here
+                [
+                    {
+                        accepted: true;
+                        action: action<performer, Card, false, stage>;
+                    }
+                ] | [
+                    {
+                        accepted: false;
+                        action: disposeAction<performer, drawnCard>
+                    },
+                    {
+                        accepted: true;
+                        action: action<performer, Card, true, stage>;
+                    }
+                ] | [
+                    {
+                        accepted: false;
+                        action: disposeAction<performer, drawnCard>
+                    },
+                    {
+                        accepted: false;
+                        action: action<performer, Card, true, stage>;
+                    }
+                ])
         } : never
     ) :
     drawnCard extends ValueCard<number> ?

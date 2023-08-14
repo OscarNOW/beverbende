@@ -37,17 +37,21 @@ export class Game {
         this.currentActivePlayer = this.activePlayers[newActivePlayerIndex];
 
         const drawnCard = this.deck.pop();
-        const newAction = this.currentActivePlayer.player.performAction(drawnCard, this.previousActions, this.currentActivePlayer.privateInformation, this.disposePile); //todo: privateInformation is private
+        const newAction: action<typeof this.currentActivePlayer, typeof drawnCard, true, 'new'>
+            = this.currentActivePlayer.player.performAction(drawnCard, this.previousActions, this.currentActivePlayer.privateInformation, this.disposePile); //todo: privateInformation is private
 
-        if (drawnCard.isActionCard && drawnCard.action === 'extraDraw') {
+        //todo-imp: create currentAction
+
+        if (newAction.type === 'extraDraw') {
+
             const firstExtraCard = this.deck.pop();
             const accepted = this.currentActivePlayer.player.acceptExtraDrawCard(firstExtraCard, this.previousActions, newAction, this.currentActivePlayer.privateInformation, this.disposePile); //todo: privateInformation is private
             //todo-imp
 
-            //todo: make action complete
+            //todo-imp: make action complete
             this.previousActions.push(newAction);
         } else {
-            //todo: make action complete
+            //todo-imp: make action complete
             this.previousActions.push(newAction);
         }
 
