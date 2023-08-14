@@ -177,7 +177,7 @@ type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeVa
 
             actions:
             stage extends 'new' ? never : //todo: test if never works here
-            stage extends 'current' ? any : //todo
+            stage extends 'current' ? [] : never | //todo: test if never works here
             [
                 {
                     accepted: true;
