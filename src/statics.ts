@@ -52,7 +52,7 @@ export class Player {
 
     performAction: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
-            previousActions: action<ActivePlayer, Card, true>[],
+            previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
             drawnCard: drawnCard
         ) =>
@@ -60,15 +60,15 @@ export class Player {
 
     declareLastRound: <activePlayer extends ActivePlayer>
         (
-            previousActions: action<ActivePlayer, Card, true>[],
+            previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>
         ) =>
         boolean;
 
     acceptExtraDrawCard: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
-            previousActions: action<ActivePlayer, Card, true>[],
-            currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true>, //todo: make this partial
+            previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+            currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
             drawnCard: drawnCard
         ) =>
@@ -100,6 +100,13 @@ export class ActivePlayer {
 type extendsWithout<extending, without> = extending extends without ? never : extending;
 type typeIsSpecific<type, values> = values extends type ? false : true;
 
+type disposeAction<performer extends ActivePlayer, drawnCard extends Card> = {
+    performer: performer;
+    type: 'dispose';
+    drawnCardLocation: 'dispose';
+    drawnCard: drawnCard;
+};
+
 type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeValueCard extends boolean, stage extends 'finished' | 'current' | 'new'> =
     drawnCard extends ActionCard<actionCardAction> ?
     (
@@ -130,21 +137,16 @@ type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeVa
                 actions: [
                     {
                         accepted: true;
-                        action: action<performer, Card, false>;
+                        action: action<performer, Card, false, stage>;
                     }
                 ] | [
                     {
                         accepted: false;
-                        action: {
-                            performer: performer;
-                            type: 'dispose';
-                            drawnCardLocation: 'dispose';
-                            drawnCard: drawnCard;
-                        }
+                        action: disposeAction<performer, drawnCard>
                     },
                     {
                         accepted: true;
-                        action: action<performer, Card, true>;
+                        action: action<performer, Card, true, stage>;
                     }
                 ]
             }
@@ -173,24 +175,22 @@ type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeVa
             drawnCardLocation: 'dispose';
             drawnCard: drawnCard;
 
-            actions: [ //todo: use stage here
+            actions:
+            stage extends 'new' ? never : //todo: test if never works here
+            stage extends 'current' ? any : //todo
+            [
                 {
                     accepted: true;
-                    action: action<performer, Card, false>;
+                    action: action<performer, Card, false, stage>;
                 }
             ] | [
                 {
                     accepted: false;
-                    action: {
-                        performer: performer;
-                        type: 'dispose';
-                        drawnCardLocation: 'dispose';
-                        drawnCard: drawnCard;
-                    }
+                    action: disposeAction<performer, drawnCard>
                 },
                 {
                     accepted: true;
-                    action: action<performer, Card, true>;
+                    action: action<performer, Card, true, stage>;
                 }
             ]
         } : never
@@ -205,12 +205,7 @@ type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeVa
             disposedCard: stage extends 'new' ? never : Card; //todo: test if never works here
         } :
         (
-            {
-                performer: performer;
-                type: 'dispose';
-                drawnCardLocation: 'dispose';
-                drawnCard: drawnCard;
-            } |
+            disposeAction<performer, drawnCard> |
             {
                 performer: performer;
                 type: 'use';
