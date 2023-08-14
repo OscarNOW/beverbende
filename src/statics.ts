@@ -52,25 +52,28 @@ export class Player {
 
     performAction: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
+            drawnCard: drawnCard,
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-            drawnCard: drawnCard
+            disposePile: Card[]
         ) =>
         action<activePlayer, drawnCard, true, 'new'>;
 
     declareLastRound: <activePlayer extends ActivePlayer>
         (
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-            privateInformation: privateInformation<activePlayer['privateInformationKeys']>
+            privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+            disposePile: Card[]
         ) =>
         boolean;
 
     acceptExtraDrawCard: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
+            drawnCard: drawnCard,
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-            drawnCard: drawnCard
+            disposePile: Card[]
         ) =>
         boolean;
 }
@@ -84,7 +87,10 @@ export class ActivePlayer {
     player: Player;
     hand: CardSlot<this>[];
 
-    private privateInformation: privateInformation<this['privateInformationKeys']>;
+    firstCardAtStart: keyof this['privateInformationKeys'];
+    lastCardAtStart: keyof this['privateInformationKeys'];
+
+    private privateInformation: privateInformation<this['privateInformationKeys']>; //todo-imp: actually implement this in code
     privateInformationKeys: string[];
 
     constructor(player: Player) {
@@ -107,7 +113,7 @@ type disposeAction<performer extends ActivePlayer, drawnCard extends Card> = {
     drawnCard: drawnCard;
 };
 
-type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeValueCard extends boolean, stage extends 'finished' | 'current' | 'new'> =
+export type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeValueCard extends boolean, stage extends 'finished' | 'current' | 'new'> =
     drawnCard extends ActionCard<actionCardAction> ?
     (
         typeIsSpecific<drawnCard['action'], actionCardAction> extends false ?

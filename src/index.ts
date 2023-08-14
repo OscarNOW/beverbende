@@ -1,12 +1,15 @@
 import { defaultHandSize, defaultDeck } from './defaults';
-import { Card, CardSlot, ActivePlayer, Player } from './statics';
+import { Card, CardSlot, ActivePlayer, Player, action } from './statics';
 
 export class Game {
     cards: Card[];
-    deck: Card[];
-
     activePlayers: ActivePlayer[];
     handSize: number;
+
+    deck: Card[];
+    disposePile: Card[];
+    previousActions: action<ActivePlayer, Card, true, 'finished'>[];
+    currentActivePlayer: ActivePlayer;
 
     constructor(players: Player[], handSize: number = defaultHandSize, cards: Card[] = defaultDeck) {
         this.handSize = handSize;
@@ -23,8 +26,38 @@ export class Game {
 
             this.activePlayers.push(activePlayer);
         }
+    }
 
-        //todo: implement a way so the player can see the two outer cards with privateInformation
+    nextAction(): void {
+        if (this.deck.length === 0) return this.finish();
+
+        let newActivePlayerIndex = this.activePlayers.indexOf(this.currentActivePlayer) + 1;
+        if (newActivePlayerIndex > this.activePlayers.length - 1) newActivePlayerIndex = 0;
+
+        this.currentActivePlayer = this.activePlayers[newActivePlayerIndex];
+
+        const drawnCard = this.deck.pop();
+        const newAction = this.currentActivePlayer.player.performAction(drawnCard, this.previousActions, this.currentActivePlayer.privateInformation, this.disposePile); //todo: privateInformation is private
+
+        if (drawnCard.isActionCard && drawnCard.action === 'extraDraw') {
+            const firstExtraCard = this.deck.pop();
+            const accepted = this.currentActivePlayer.player.acceptExtraDrawCard(firstExtraCard, this.previousActions, newAction, this.currentActivePlayer.privateInformation, this.disposePile); //todo: privateInformation is private
+            //todo-imp
+
+            //todo: make action complete
+            this.previousActions.push(newAction);
+        } else {
+            //todo: make action complete
+            this.previousActions.push(newAction);
+        }
+
+        //todo-imp: call declareLastRound
+    }
+
+    //todo-imp: implement lastRound method
+
+    finish(): void {
+        //todo-imp
     }
 }
 
