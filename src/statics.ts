@@ -183,7 +183,7 @@ export type action<performer extends ActivePlayer, drawnCard extends Card, canDi
 
             actions:
             stage extends 'new' ? never : //todo: test if never works here
-            stage extends 'current' ? [] : never | //todo: test if never works here
+            (stage extends 'current' ? [] : never) | //todo: test if never works here
             [
                 {
                     accepted: true;
@@ -196,6 +196,15 @@ export type action<performer extends ActivePlayer, drawnCard extends Card, canDi
                 },
                 {
                     accepted: true;
+                    action: action<performer, Card, true, stage>;
+                }
+            ] | [
+                {
+                    accepted: false;
+                    action: disposeAction<performer, drawnCard>
+                },
+                {
+                    accepted: false;
                     action: action<performer, Card, true, stage>;
                 }
             ]
