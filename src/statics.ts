@@ -208,7 +208,8 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
                     accepted: false;
                     action: disposeAction<performer, Card>;
                 }
-            ])
+            ]
+        );
     } : never);
 
 export type action<performer extends ActivePlayer, drawnCard extends Card, canDisposeValueCard extends boolean, stage extends 'finished' | 'current' | 'new'> =
