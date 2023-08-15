@@ -87,7 +87,7 @@ export class Game {
         this.state = 'lastRound';
     }
 
-    private finish(): void {
+    private finish(): void { //todo-imp: actually call this when lastRound finishes
         if (this.state === 'finished') throw new Error('Game already finished');
 
         this.state = 'finished';
