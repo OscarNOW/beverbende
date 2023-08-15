@@ -19,27 +19,18 @@ export class ValueCard<value extends number> {
 export type Card = ActionCard<actionCardActionName> | ValueCard<number>;
 
 export class CardSlot<owner extends ActivePlayer> {
-    private currentCard: Card;
+    handCardId: string;
     previousCards: Card[];
 
     activePlayer: owner;
     handIndex: number;
 
-    constructor(currentCard: Card, activePlayer: owner, handIndex: number) {
-        this.currentCard = currentCard;
+    constructor(handCardId: string, activePlayer: owner, handIndex: number) {
+        this.handCardId = handCardId;
         this.activePlayer = activePlayer;
         this.handIndex = handIndex;
 
         this.previousCards = [];
-    };
-
-    replace(newCard: Card): Card {
-        const oldCard = this.currentCard;
-
-        this.previousCards.push(oldCard);
-        this.currentCard = newCard;
-
-        return oldCard;
     };
 }
 
