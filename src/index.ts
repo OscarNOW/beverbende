@@ -57,7 +57,7 @@ export class Game {
 
         this.previousActions.push(action);
 
-        const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.disposePile);
+        const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.state === 'lastRound', this.disposePile);
         if (declaresLastRound) this.lastRound();
     }
 
@@ -84,7 +84,7 @@ export class Game {
         if (this.state === 'finished') throw new Error('Game already finished');
         if (this.state === 'lastRound') throw new Error('Game is already in lastRound state');
 
-        this.state = 'lastRound'; //todo-imp: also tell this to players, maybe as action?
+        this.state = 'lastRound';
     }
 
     private finish(): void {
@@ -119,7 +119,7 @@ export class Game {
 
 function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
-        = game.currentActivePlayer.performAction(drawnCard, this.previousActions, game.disposePile);
+        = game.currentActivePlayer.performAction(drawnCard, this.previousActions, game.state === 'lastRound', game.disposePile);
 
     if (newAction.performer !== game.currentActivePlayer)
         throw new Error('Performer of returned action isn\'t self');
@@ -160,6 +160,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
         const firstExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
             firstExtraCard,
             game.previousActions,
+            game.state === 'lastRound',
             currentAction as action<ActivePlayer, ActionCard<'extraDraw'>, canDisposeValueCard, 'current'>,
             game.disposePile
         );
@@ -190,6 +191,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
             const secondExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
                 firstExtraCard,
                 game.previousActions,
+                game.state === 'lastRound',
                 currentAction as action<ActivePlayer, ActionCard<'extraDraw'>, canDisposeValueCard, 'current'>,
                 game.disposePile
             );
