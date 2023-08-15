@@ -97,7 +97,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
         );
 
         if (firstExtraCardAccepted) {
-            const action = createAction<false>(deck, disposePile, activePlayer, firstExtraCard);
+            const action = createAction<false>(game, firstExtraCard);
 
             return {
                 ...currentAction,
@@ -128,7 +128,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
             );
 
             if (secondExtraCardAccepted) {
-                const action = createAction<false>(deck, disposePile, activePlayer, secondExtraCard);
+                const action = createAction<false>(game, secondExtraCard);
 
                 return {
                     ...currentAction,
