@@ -90,12 +90,18 @@ export class ActivePlayer {
     firstCardAtStart: this['privateInformationKeys'][number];
     lastCardAtStart: this['privateInformationKeys'][number];
 
-    private privateInformation: privateInformation<this['privateInformationKeys']>; //todo-imp: actually implement this in code
+    private privateInformation: privateInformation<this['privateInformationKeys']>;
     privateInformationKeys: string[];
 
     constructor(player: Player) {
         this.player = player;
         this.hand = [];
+    }
+
+    addToPrivateInformation(key: string, value: Card): void {
+        if (this.privateInformation[key]) throw new Error('privateInformation key already set');
+        this.privateInformation[key] = value;
+        this.privateInformationKeys.push(key);
     }
 
     addCardSlot(cardSlot: CardSlot<this>): void { //todo: make private?
