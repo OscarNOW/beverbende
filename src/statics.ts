@@ -45,6 +45,7 @@ export class Player {
         (
             drawnCard: drawnCard,
             canDisposeValueCard: canDisposeValueCard,
+            activePlayer: activePlayer,
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             isLastRound: boolean,
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
@@ -54,6 +55,7 @@ export class Player {
 
     declareLastRound: <activePlayer extends ActivePlayer>
         (
+            activePlayer: activePlayer,
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             isLastRound: boolean,
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
@@ -64,6 +66,7 @@ export class Player {
     acceptExtraDrawCard: <activePlayer extends ActivePlayer, drawnCard extends Card>
         (
             drawnCard: drawnCard,
+            activePlayer: activePlayer,
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             isLastRound: boolean,
             currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
@@ -110,7 +113,7 @@ export class ActivePlayer {
         isLastRound: boolean,
         disposePile: Card[]
     ): action<this, drawnCard, canDisposeValueCard, 'new'> {
-        return this.player.performAction(drawnCard, canDisposeValueCard, previousActions, isLastRound, this.privateInformation, disposePile);
+        return this.player.performAction(drawnCard, canDisposeValueCard, this, previousActions, isLastRound, this.privateInformation, disposePile);
     };
 
     declareLastRound(
@@ -118,7 +121,7 @@ export class ActivePlayer {
         isLastRound: boolean,
         disposePile: Card[]
     ): boolean {
-        return this.player.declareLastRound(previousActions, isLastRound, this.privateInformation, disposePile);
+        return this.player.declareLastRound(this, previousActions, isLastRound, this.privateInformation, disposePile);
     }
 
     acceptExtraDrawCard<drawnCard extends Card>(
@@ -128,7 +131,7 @@ export class ActivePlayer {
         currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
         disposePile: Card[]
     ): boolean {
-        return this.player.acceptExtraDrawCard(drawnCard, previousActions, isLastRound, currentAction, this.privateInformation, disposePile);
+        return this.player.acceptExtraDrawCard(drawnCard, this, previousActions, isLastRound, currentAction, this.privateInformation, disposePile);
     }
 }
 
