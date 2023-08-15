@@ -161,7 +161,7 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
             ] | [
                 {
                     accepted: false;
-                    action: disposeAction<performer, Card>
+                    action: disposeAction<performer, Card>;
                 },
                 {
                     accepted: true;
@@ -170,11 +170,11 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
             ] | [
                 {
                     accepted: false;
-                    action: disposeAction<performer, Card>
+                    action: disposeAction<performer, Card>;
                 },
                 {
                     accepted: false;
-                    action: action<performer, Card, true, stage>;
+                    action: disposeAction<performer, Card>;
                 }
             ])
     } : never);
