@@ -23,7 +23,8 @@ export class Game {
         this.cards = cards;
         this.deck = shuffle(cards);
 
-        //todo: check if there are enough cards in the deck for all the players
+        if (this.deck.length < handSize * players.length)
+            throw new Error('There are not enough cards for all the players');
 
         this.activePlayers = [];
         for (const player of players) {
@@ -52,13 +53,7 @@ export class Game {
 
         this.currentActivePlayer = this.activePlayers[newActivePlayerIndex];
 
-        let action: action<ActivePlayer, Card, true, 'finished'>;
-        try {
-            action = createAction(this, this.addDisposePileToDeck, this.handCards, this.replaceHandCard, drawnCard);
-        } catch (e) {
-            if (e.message === 'noCardsInNewDeck') //todo: test if this works
-                return this.finish();
-        }
+        let action = createAction(this, this.addDisposePileToDeck, this.handCards, this.replaceHandCard, drawnCard);
 
         this.previousActions.push(action);
 
@@ -73,7 +68,7 @@ export class Game {
         this.deck = shuffle(this.deck);
 
         if (this.deck.length === 0)
-            throw new Error('noCardsInNewDeck');
+            throw new Error('There are no cards left in the dispose pile for the deck');
     }
 
     private replaceHandCard(cardSlot: CardSlot<ActivePlayer>, newCard: Card): Card {
