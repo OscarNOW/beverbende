@@ -41,7 +41,7 @@ export class Game {
 
         let action: action<ActivePlayer, Card, true, 'finished'>;
         try {
-            action = createAction(this, drawnCard);
+            action = createAction(this, this.addDisposePileToDeck, drawnCard);
         } catch (e) {
             if (e.message === 'noCardsInNewDeck') //todo: test if this works
                 return this.finish();
@@ -69,12 +69,12 @@ export class Game {
     }
 }
 
-function createAction<canDisposeValueCard extends boolean>(game: Game, drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
+function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: () => void, drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'> //todo: ActivePlayer and Card could be any ActivePlayer or Card
         = game.currentActivePlayer.performAction(drawnCard, this.previousActions, game.disposePile); //todo: privateInformation is private
 
     let currentAction: action<ActivePlayer, Card, canDisposeValueCard, 'current'> = newActionToCurrent(newAction, drawnCard);
-    let finishedAction: action<ActivePlayer, Card, canDisposeValueCard, 'finished'> = currentActionToFinished(game, currentAction);
+    let finishedAction: action<ActivePlayer, Card, canDisposeValueCard, 'finished'> = currentActionToFinished(game, addDisposePileToDeck, currentAction);
 
     return finishedAction;
 }
@@ -101,9 +101,9 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(newAction: acti
     return newAction;
 }
 
-function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
+function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, addDisposePileToDeck: () => void, currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     if (currentAction.type === 'extraDraw' && currentAction.drawnCard.action === 'extraDraw') {
-        if (game.deck.length === 0) game.addDisposePileToDeck(); //todo: addDisposePileToDeck is private
+        if (game.deck.length === 0) addDisposePileToDeck(); //todo: addDisposePileToDeck is private
         const firstExtraCard = game.deck.pop();
 
         const firstExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
@@ -114,7 +114,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
         );
 
         if (firstExtraCardAccepted) {
-            const action = createAction<false>(game, firstExtraCard);
+            const action = createAction<false>(game, addDisposePileToDeck, firstExtraCard);
 
             return {
                 ...currentAction,
@@ -133,7 +133,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
                 drawnCard: firstExtraCard
             };
 
-            if (game.deck.length === 0) game.addDisposePileToDeck(); //todo: addDisposePileToDeck is private
+            if (game.deck.length === 0) addDisposePileToDeck(); //todo: addDisposePileToDeck is private
             const secondExtraCard = game.deck.pop();
 
             const secondExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
@@ -144,7 +144,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
             );
 
             if (secondExtraCardAccepted) {
-                const action = createAction<false>(game, secondExtraCard);
+                const action = createAction<false>(game, addDisposePileToDeck, secondExtraCard);
 
                 return {
                     ...currentAction,
