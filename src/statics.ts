@@ -80,15 +80,15 @@ export class Player {
 
 type privateInformation<includingKeys extends string[]> = {
     // eslint-disable-next-line no-unused-vars
-    [privateInformationId in keyof includingKeys]: Card; //todo: test if this works
+    [privateInformationId in includingKeys[number]]: Card; //todo: test if this works
 };
 
 export class ActivePlayer {
     player: Player;
     hand: CardSlot<this>[];
 
-    firstCardAtStart: keyof this['privateInformationKeys'];
-    lastCardAtStart: keyof this['privateInformationKeys'];
+    firstCardAtStart: this['privateInformationKeys'][number];
+    lastCardAtStart: this['privateInformationKeys'][number];
 
     private privateInformation: privateInformation<this['privateInformationKeys']>; //todo-imp: actually implement this in code
     privateInformationKeys: string[];
@@ -165,7 +165,7 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
         drawnCard: drawnCard;
 
         cardSlot: CardSlot<performer>;
-        privateInformationId: keyof performer['privateInformationKeys']
+        privateInformationId: performer['privateInformationKeys'][number]
     } : never) |
 
     ('extraDraw' extends drawnCard['action'] ? {
