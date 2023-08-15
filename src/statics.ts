@@ -41,39 +41,39 @@ export class Player {
         this.name = name;
     }
 
-    performAction: <canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>
-        (
-            drawnCard: drawnCard,
-            canDisposeValueCard: canDisposeValueCard,
-            activePlayer: activePlayer,
-            previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-            isLastRound: boolean,
-            privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-            disposePile: Card[]
-        ) =>
-        action<activePlayer, drawnCard, canDisposeValueCard, 'new'>;
+    performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
+        drawnCard: drawnCard,
+        canDisposeValueCard: canDisposeValueCard,
+        activePlayer: activePlayer,
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        isLastRound: boolean,
+        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+        disposePile: Card[]
+    ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
+        throw new Error('Extend this class and implement your own method');
+    };
 
-    declareLastRound: <activePlayer extends ActivePlayer>
-        (
-            activePlayer: activePlayer,
-            previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-            isLastRound: boolean,
-            privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-            disposePile: Card[]
-        ) =>
-        boolean;
+    declareLastRound<activePlayer extends ActivePlayer>(
+        activePlayer: activePlayer,
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        isLastRound: boolean,
+        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+        disposePile: Card[]
+    ): boolean {
+        throw new Error('Extend this class and implement your own method');
+    };
 
-    acceptExtraDrawCard: <activePlayer extends ActivePlayer, drawnCard extends Card>
-        (
-            drawnCard: drawnCard,
-            activePlayer: activePlayer,
-            previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-            isLastRound: boolean,
-            currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
-            privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-            disposePile: Card[]
-        ) =>
-        boolean;
+    acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
+        drawnCard: drawnCard,
+        activePlayer: activePlayer,
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        isLastRound: boolean,
+        currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
+        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+        disposePile: Card[]
+    ): boolean {
+        throw new Error('Extend this class and implement your own method');
+    };
 }
 
 export type privateInformation<includingKeys extends string[]> = {
