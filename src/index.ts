@@ -13,14 +13,17 @@ export class Game {
 
     state: 'active' | 'lastRound' | 'finished';
     activePlayerPoints: null | number[];
+    lastRoundCaller: null | ActivePlayer;
 
     private handCards: { [handCardId: string]: Card };
 
     constructor(players: Player[], handSize: number = defaultHandSize, cards: Card[] = defaultDeck) {
         this.handSize = handSize;
-        this.activePlayerPoints = null;
-
         this.cards = cards;
+
+        this.activePlayerPoints = null;
+        this.lastRoundCaller = null;
+
         this.deck = shuffle(cards);
 
         if (this.deck.length < handSize * players.length)
@@ -53,12 +56,15 @@ export class Game {
 
         this.currentActivePlayer = this.activePlayers[newActivePlayerIndex];
 
+        if (this.lastRoundCaller !== null && this.currentActivePlayer === this.lastRoundCaller)
+            return this.finish();
+
         let action = createAction(this, this.addDisposePileToDeck, this.handCards, this.replaceHandCard, drawnCard);
 
         this.previousActions.push(action);
 
         const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.state === 'lastRound', this.disposePile);
-        if (declaresLastRound) this.lastRound();
+        if (declaresLastRound) this.lastRound(this.currentActivePlayer);
     }
 
     private addDisposePileToDeck() {
@@ -80,14 +86,15 @@ export class Game {
         return oldCard;
     }
 
-    private lastRound(): void {
+    private lastRound(activePlayer: ActivePlayer): void {
         if (this.state === 'finished') throw new Error('Game already finished');
         if (this.state === 'lastRound') throw new Error('Game is already in lastRound state');
 
         this.state = 'lastRound';
+        this.lastRoundCaller = activePlayer;
     }
 
-    private finish(): void { //todo-imp: actually call this when lastRound finishes
+    private finish(): void {
         if (this.state === 'finished') throw new Error('Game already finished');
 
         this.state = 'finished';
