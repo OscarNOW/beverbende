@@ -50,14 +50,14 @@ export class Player {
         this.name = name;
     }
 
-    performAction: <activePlayer extends ActivePlayer, drawnCard extends Card>
+    performAction: <canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>
         (
             drawnCard: drawnCard,
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
             disposePile: Card[]
         ) =>
-        action<activePlayer, drawnCard, true, 'new'>;
+        action<activePlayer, drawnCard, canDisposeValueCard, 'new'>;
 
     declareLastRound: <activePlayer extends ActivePlayer>
         (
@@ -98,8 +98,32 @@ export class ActivePlayer {
         this.hand = [];
     }
 
-    addCardSlot(cardSlot: CardSlot<this>): void {
+    addCardSlot(cardSlot: CardSlot<this>): void { //todo: make private?
         this.hand.push(cardSlot);
+    }
+
+    performAction<canDisposeValueCard extends boolean, drawnCard extends Card>(
+        drawnCard: drawnCard,
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        disposePile: Card[]
+    ): action<this, drawnCard, canDisposeValueCard, 'new'> {
+        return this.player.performAction<canDisposeValueCard, this, drawnCard>(drawnCard, previousActions, this.privateInformation, disposePile);
+    };
+
+    declareLastRound(
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        disposePile: Card[]
+    ): boolean {
+        return this.player.declareLastRound(previousActions, this.privateInformation, disposePile);
+    }
+
+    acceptExtraDrawCard<drawnCard extends Card>(
+        drawnCard: drawnCard,
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
+        disposePile: Card[]
+    ): boolean {
+        return this.player.acceptExtraDrawCard(drawnCard, previousActions, currentAction, this.privateInformation, disposePile);
     }
 }
 
