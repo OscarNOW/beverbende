@@ -59,7 +59,7 @@ export class Game {
         if (this.lastRoundCaller !== null && this.currentActivePlayer === this.lastRoundCaller)
             return this.finish();
 
-        let action = createAction(this, this.addDisposePileToDeck, this.handCards, this.replaceHandCard, drawnCard);
+        let action = createAction(this, this.addDisposePileToDeck, this.handCards, this.replaceHandCard, drawnCard, true);
 
         this.previousActions.push(action);
 
@@ -124,9 +124,9 @@ export class Game {
     }
 }
 
-function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
+function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card, canDisposeValueCard: canDisposeValueCard): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
-        = game.currentActivePlayer.performAction(drawnCard, this.previousActions, game.state === 'lastRound', game.disposePile);
+        = game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, this.previousActions, game.state === 'lastRound', game.disposePile);
 
     if (newAction.performer !== game.currentActivePlayer)
         throw new Error('Performer of returned action isn\'t self');
@@ -173,7 +173,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
         );
 
         if (firstExtraCardAccepted) {
-            const action = createAction<false>(game, addDisposePileToDeck, handCards, replaceHandCard, firstExtraCard);
+            const action = createAction(game, addDisposePileToDeck, handCards, replaceHandCard, firstExtraCard, false);
 
             return {
                 ...currentAction,
@@ -204,7 +204,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
             );
 
             if (secondExtraCardAccepted) {
-                const action = createAction<false>(game, addDisposePileToDeck, handCards, replaceHandCard, secondExtraCard);
+                const action = createAction(game, addDisposePileToDeck, handCards, replaceHandCard, secondExtraCard, false);
 
                 return {
                     ...currentAction,

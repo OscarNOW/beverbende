@@ -44,6 +44,7 @@ export class Player {
     performAction: <canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>
         (
             drawnCard: drawnCard,
+            canDisposeValueCard: canDisposeValueCard,
             previousActions: action<ActivePlayer, Card, true, 'finished'>[],
             isLastRound: boolean,
             privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
@@ -72,7 +73,7 @@ export class Player {
         boolean;
 }
 
-type privateInformation<includingKeys extends string[]> = {
+export type privateInformation<includingKeys extends string[]> = {
     // eslint-disable-next-line no-unused-vars
     [privateInformationId in includingKeys[number]]: Card; //todo: test if this works
 };
@@ -104,11 +105,12 @@ export class ActivePlayer {
 
     performAction<canDisposeValueCard extends boolean, drawnCard extends Card>(
         drawnCard: drawnCard,
+        canDisposeValueCard: canDisposeValueCard,
         previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         isLastRound: boolean,
         disposePile: Card[]
     ): action<this, drawnCard, canDisposeValueCard, 'new'> {
-        return this.player.performAction<canDisposeValueCard, this, drawnCard>(drawnCard, previousActions, isLastRound, this.privateInformation, disposePile);
+        return this.player.performAction(drawnCard, canDisposeValueCard, previousActions, isLastRound, this.privateInformation, disposePile);
     };
 
     declareLastRound(
