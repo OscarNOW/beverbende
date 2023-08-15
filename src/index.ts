@@ -119,7 +119,7 @@ export class Game {
 
 function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'> //todo: ActivePlayer and Card could be any ActivePlayer or Card
-        = game.currentActivePlayer.performAction(drawnCard, this.previousActions, game.disposePile); //todo: privateInformation is private
+        = game.currentActivePlayer.performAction(drawnCard, this.previousActions, game.disposePile);
 
     let currentAction: action<ActivePlayer, Card, canDisposeValueCard, 'current'> = newActionToCurrent(game, handCards, replaceHandCard, newAction, drawnCard);
     let finishedAction: action<ActivePlayer, Card, canDisposeValueCard, 'finished'> = currentActionToFinished(game, addDisposePileToDeck, handCards, replaceHandCard, currentAction);
@@ -151,7 +151,7 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, han
 
 function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     if (currentAction.type === 'extraDraw' && currentAction.drawnCard.action === 'extraDraw') {
-        if (game.deck.length === 0) addDisposePileToDeck(); //todo: addDisposePileToDeck is private
+        if (game.deck.length === 0) addDisposePileToDeck();
         const firstExtraCard = game.deck.pop();
 
         const firstExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
@@ -181,7 +181,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
                 drawnCard: firstExtraCard
             };
 
-            if (game.deck.length === 0) addDisposePileToDeck(); //todo: addDisposePileToDeck is private
+            if (game.deck.length === 0) addDisposePileToDeck();
             const secondExtraCard = game.deck.pop();
 
             const secondExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
