@@ -17,6 +17,8 @@ export class Game {
         this.cards = cards;
         this.deck = shuffle(cards);
 
+        //todo: check if there are enough cards in the deck for all the players
+
         this.activePlayers = [];
         for (const player of players) {
             const activePlayer = new ActivePlayer(player);
@@ -29,7 +31,7 @@ export class Game {
     }
 
     nextAction(): void {
-        if (this.deck.length === 0) return this.finish();
+        if (this.deck.length === 0) this.addDisposePileToDeck();
         const drawnCard = this.deck.pop();
 
         let newActivePlayerIndex = this.activePlayers.indexOf(this.currentActivePlayer) + 1;
@@ -37,11 +39,27 @@ export class Game {
 
         this.currentActivePlayer = this.activePlayers[newActivePlayerIndex];
 
-        const action = createAction(this, drawnCard);
+        let action: action<ActivePlayer, Card, true, 'finished'>;
+        try {
+            action = createAction(this, drawnCard);
+        } catch (e) {
+            if (e.message === 'noCardsInNewDeck') //todo: test if this works
+                return this.finish();
+        }
 
         this.previousActions.push(action);
 
         //todo-imp: call declareLastRound
+    }
+
+    private addDisposePileToDeck() {
+        this.deck = this.deck.concat(this.disposePile);
+        this.disposePile = [];
+
+        this.deck = shuffle(this.deck);
+
+        if (this.deck.length === 0)
+            throw new Error('noCardsInNewDeck');
     }
 
     //todo-imp: implement lastRound method
@@ -85,7 +103,7 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(newAction: acti
 
 function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     if (currentAction.type === 'extraDraw' && currentAction.drawnCard.action === 'extraDraw') {
-        //todo: check if deck is empty
+        if (game.deck.length === 0) game.addDisposePileToDeck(); //todo: addDisposePileToDeck is private
         const firstExtraCard = game.deck.pop();
 
         const firstExtraCardAccepted = game.currentActivePlayer.player.acceptExtraDrawCard(
@@ -116,7 +134,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
                 drawnCard: firstExtraCard
             };
 
-            //todo: check if deck is empty
+            if (game.deck.length === 0) game.addDisposePileToDeck(); //todo: addDisposePileToDeck is private
             const secondExtraCard = game.deck.pop();
 
             const secondExtraCardAccepted = game.currentActivePlayer.player.acceptExtraDrawCard(
