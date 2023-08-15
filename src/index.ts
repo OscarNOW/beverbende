@@ -1,5 +1,5 @@
 import { defaultHandSize, defaultDeck } from './defaults';
-import { Card, CardSlot, ActivePlayer, Player, action, ActionCard } from './statics';
+import { Card, CardSlot, ActivePlayer, Player, action, ActionCard, ValueCard } from './statics';
 
 export class Game {
     cards: Card[];
@@ -11,10 +11,14 @@ export class Game {
     previousActions: action<ActivePlayer, Card, true, 'finished'>[];
     currentActivePlayer: ActivePlayer;
 
+    state: 'active' | 'lastRound' | 'finished';
+    activePlayerPoints: null | number[];
+
     private handCards: { [handCardId: string]: Card };
 
     constructor(players: Player[], handSize: number = defaultHandSize, cards: Card[] = defaultDeck) {
         this.handSize = handSize;
+        this.activePlayerPoints = null;
 
         this.cards = cards;
         this.deck = shuffle(cards);
@@ -38,6 +42,8 @@ export class Game {
     }
 
     nextAction(): void {
+        if (this.state === 'finished') throw new Error('Game already finished');
+
         if (this.deck.length === 0) this.addDisposePileToDeck();
         const drawnCard = this.deck.pop();
 
@@ -56,7 +62,8 @@ export class Game {
 
         this.previousActions.push(action);
 
-        //todo-imp: call declareLastRound
+        const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.disposePile);
+        if (declaresLastRound) this.lastRound();
     }
 
     private addDisposePileToDeck() {
@@ -78,10 +85,40 @@ export class Game {
         return oldCard;
     }
 
-    //todo-imp: implement lastRound method
+    private lastRound(): void {
+        if (this.state === 'finished') throw new Error('Game already finished');
+        if (this.state === 'lastRound') throw new Error('Game is already in lastRound state');
 
-    finish(): void {
-        //todo-imp
+        this.state = 'lastRound'; //todo: also tell this to players, maybe as action?
+    }
+
+    private finish(): void {
+        if (this.state === 'finished') throw new Error('Game already finished');
+
+        this.state = 'finished';
+
+        let activePlayerPoints: number[] = [];
+
+        for (const activePlayer of this.activePlayers) {
+            const cards = activePlayer.hand.map(cardSlot => this.handCards[cardSlot.handCardId]);
+            let valueCards: ValueCard<number>[] = [];
+
+            for (let card of cards) {
+                if (card.isActionCard === false && !this.deck.find(card => card.isActionCard === false))
+                    throw new Error('No valueCards left in the deck')
+
+                while (card.isActionCard === true) {
+                    if (this.deck.length === 0) this.addDisposePileToDeck();
+                    card = this.deck.pop();
+                };
+
+                valueCards.push(card);
+            };
+
+            activePlayerPoints.push(sum(valueCards.map(card => card.value)));
+        };
+
+        this.activePlayerPoints = activePlayerPoints;
     }
 }
 
@@ -199,6 +236,10 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
             }
         }
     }
+}
+
+function sum(array: number[]): number {
+    return array.reduce((a, b) => a + b, 0);
 }
 
 function shuffle<element>(array: element[]): element[] {
