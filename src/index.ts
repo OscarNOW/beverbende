@@ -84,7 +84,7 @@ export class Game {
         if (this.state === 'finished') throw new Error('Game already finished');
         if (this.state === 'lastRound') throw new Error('Game is already in lastRound state');
 
-        this.state = 'lastRound'; //todo: also tell this to players, maybe as action?
+        this.state = 'lastRound'; //todo-imp: also tell this to players, maybe as action?
     }
 
     private finish(): void {
