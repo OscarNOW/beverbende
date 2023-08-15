@@ -73,19 +73,19 @@ function createAction<canDisposeValueCard extends boolean>(game: Game, addDispos
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'> //todo: ActivePlayer and Card could be any ActivePlayer or Card
         = game.currentActivePlayer.performAction(drawnCard, this.previousActions, game.disposePile); //todo: privateInformation is private
 
-    let currentAction: action<ActivePlayer, Card, canDisposeValueCard, 'current'> = newActionToCurrent(newAction, drawnCard);
+    let currentAction: action<ActivePlayer, Card, canDisposeValueCard, 'current'> = newActionToCurrent(game, newAction, drawnCard);
     let finishedAction: action<ActivePlayer, Card, canDisposeValueCard, 'finished'> = currentActionToFinished(game, addDisposePileToDeck, currentAction);
 
     return finishedAction;
 }
 
-function newActionToCurrent<canDisposeValueCard extends boolean>(newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>, drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'current'> {
+function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>, drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'current'> {
     if (newAction.type === 'look') {
         const card = newAction.cardSlot.currentCard; //todo: is private
         const privateInformationId = Math.floor(Math.random() * 10000);
 
-        this.currentActivePlayer.privateInformation[privateInformationId] = card;
-        this.currentActivePlayer.privateInformationKeys.push(privateInformationId);
+        game.currentActivePlayer.privateInformation[privateInformationId] = card;
+        game.currentActivePlayer.privateInformationKeys.push(privateInformationId);
 
         return {
             ...newAction,
