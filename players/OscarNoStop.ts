@@ -3,7 +3,7 @@ const stopRound = 50;
 import { ActionCard, ActivePlayer, Card, Player, ValueCard, action, privateInformation } from '../src/statics';
 import { Game } from '../src/index';
 
-type handCards = ('action' | 'good' | 'bad' | 'unknown' | number)[];
+type handCards = ('action' | 'good' | 'bad' | 'unknown' | 'known' | number)[];
 
 export class OscarNoStop extends Player {
     constructor() {
@@ -139,6 +139,8 @@ export class OscarNoStop extends Player {
 }
 
 function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, previousActions: action<ActivePlayer, Card, true, 'finished'>[], privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
+    const averageCard = getAverageCard(game);
+
     const activePlayerInfo: WeakMap<ActivePlayer, {
         handCards: handCards;
     }> = new WeakMap();
@@ -157,6 +159,13 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
     for (const action of previousActions) {
         if (!activePlayerInfo.has(action.performer))
             activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
+
+        if (action.type === 'dispose') {
+            if (action.drawnCard.value <= averageCard)
+                activePlayerInfo.get(activePlayer).handCards = activePlayerInfo.get(activePlayer).handCards.map(handCard => handCard === 'known' ? 'good' : handCard);
+        } else {
+            //todo-imp
+        }
     }
 
     return activePlayerInfo;
@@ -183,6 +192,7 @@ function compareHandCards(game: Game, a: handCards[number], b: handCards[number]
     const ranking = [
         ...Array(averageCard).fill(null).map((_, i) => i),
         'good',
+        'known',
         averageCard,
         'unknown',
         'action',
