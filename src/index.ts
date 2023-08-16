@@ -110,9 +110,6 @@ export class Game {
             let valueCards: ValueCard<number>[] = [];
 
             for (let card of cards) {
-                if (card.isActionCard === false && !this.deck.find(card => card.isActionCard === false))
-                    throw new Error('No valueCards left in the deck')
-
                 while (card.isActionCard === true) {
                     if (this.deck.length === 0) this.addDisposePileToDeck();
                     card = this.deck.pop();
