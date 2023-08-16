@@ -34,14 +34,22 @@ export class Game {
 
         this.activePlayers = [];
         for (const player of players) {
-            const activePlayer = new ActivePlayer(player);
-
+            const cards = [];
             for (let i = 0; i < handSize; i++) {
                 const card = this.deck.pop();
+                cards.push(card);
+            }
+
+            const activePlayer = new ActivePlayer(player, cards[0], cards[cards.length - 1]);
+
+            for (const i in cards) {
+                const index = parseInt(i);
+                const card = cards[i];
+
                 const handCardId = `${Math.floor(Math.random() * 1000)}`;
                 this.handCards[handCardId] = card;
 
-                activePlayer.addCardSlot(new CardSlot(handCardId, activePlayer, i));
+                activePlayer.addCardSlot(new CardSlot(handCardId, activePlayer, index));
             }
 
             this.activePlayers.push(activePlayer);

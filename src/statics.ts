@@ -97,11 +97,20 @@ export class ActivePlayer {
     private privateInformation: privateInformation<this['privateInformationKeys']>;
     privateInformationKeys: string[];
 
-    constructor(player: Player) {
+    constructor(player: Player, firstCardAtStart: Card, lastCardAtStart: Card) {
         this.player = player;
         this.hand = [];
+
         this.privateInformationKeys = [];
         this.privateInformation = {} as privateInformation<this['privateInformationKeys']>;
+
+        const firstCardAtStartPrivateInformationId = `${Math.floor(Math.random() * 10000)}`;
+        this.addToPrivateInformation(firstCardAtStartPrivateInformationId, firstCardAtStart);
+        this.firstCardAtStart = firstCardAtStartPrivateInformationId;
+
+        const lastCardAtStartPrivateInformationId = `${Math.floor(Math.random() * 10000)}`; //todo: check so that is not same as above
+        this.addToPrivateInformation(lastCardAtStartPrivateInformationId, lastCardAtStart);
+        this.lastCardAtStart = lastCardAtStartPrivateInformationId;
     }
 
     addToPrivateInformation(key: string, value: Card): void {
