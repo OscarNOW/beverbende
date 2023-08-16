@@ -6,7 +6,7 @@ import { OscarNoStop } from './players/OscarNoStop';
 const aPoints = [];
 const bPoints = [];
 
-for (let ii = 0; ii < 1000; ii++) {
+for (let ii = 0; ii < 10000; ii++) {
     const game = new Game([new FirstPossibility(), new OscarNoStop()]);
 
     while (game.state !== 'finished')
