@@ -7,6 +7,7 @@ export class ActionCard<currentAction extends actionCardActionName> {
 
     constructor(action: currentAction) {
         this.action = action;
+        this.isActionCard = true;
     }
 }
 
@@ -16,6 +17,7 @@ export class ValueCard<value extends number> {
 
     constructor(value: value) {
         this.value = value;
+        this.isActionCard = false;
     }
 }
 export type Card = ActionCard<actionCardActionName> | ValueCard<number>;
