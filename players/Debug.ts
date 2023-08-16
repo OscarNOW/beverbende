@@ -1,4 +1,4 @@
-import { ActivePlayer, Card, Player, action, privateInformation } from '../src/statics';
+import { ActionCard, ActivePlayer, Card, Player, action, privateInformation } from '../src/statics';
 import { Game } from '../src/index';
 
 export class Debug extends Player {
@@ -64,4 +64,26 @@ export class Debug extends Player {
         else
             throw new Error(`Unknown isActionCard: "${drawnCard.isActionCard}"`)
     }
+
+    declareLastRound<activePlayer extends ActivePlayer>(
+        activePlayer: activePlayer,
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+        disposePile: Card[]
+    ): boolean {
+        return false;
+    }
+
+    acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
+        drawnCard: drawnCard,
+        activePlayer: activePlayer,
+        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
+        isLastRound: boolean,
+        currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
+        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+        disposePile: Card[]
+    ) {
+        return true;
+    }
+
 }
