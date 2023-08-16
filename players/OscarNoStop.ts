@@ -5,10 +5,6 @@ import { Game } from '../src/index';
 
 type handCards = ('action' | 'good' | 'bad' | 'unknown' | number)[];
 
-const activePlayerInfo: WeakMap<ActivePlayer, {
-    handCards: handCards;
-}> = new WeakMap();
-
 export class OscarNoStop extends Player {
     constructor() {
         super('OscarNoStop');
@@ -24,7 +20,25 @@ export class OscarNoStop extends Player {
         disposePile: Card[],
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
-        //todo-imp: implement setting of activePlayerInfo based on previousActions
+        const activePlayerInfo: WeakMap<ActivePlayer, {
+            handCards: handCards;
+        }> = new WeakMap();
+
+        if (!activePlayerInfo.has(activePlayer))
+            activePlayerInfo.set(activePlayer, { handCards: Array(game.handSize).fill('unknown') });
+
+        activePlayerInfo.get(activePlayer).handCards[0] =
+            privateInformation[activePlayer.firstCardAtStart].isActionCard === true ? 'action' :
+                (privateInformation[activePlayer.firstCardAtStart] as ValueCard<number>).value;
+
+        activePlayerInfo.get(activePlayer).handCards[activePlayerInfo.get(activePlayer).handCards.length - 1] =
+            privateInformation[activePlayer.lastCardAtStart].isActionCard === true ? 'action' :
+                (privateInformation[activePlayer.lastCardAtStart] as ValueCard<number>).value;
+
+        for (const action of previousActions) {
+            if (!activePlayerInfo.has(action.performer))
+                activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
+        }
 
         if (drawnCard.isActionCard)
             if (drawnCard.action === 'extraDraw')
