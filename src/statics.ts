@@ -105,15 +105,15 @@ export class ActivePlayer {
         this.privateInformation = {} as privateInformation<this['privateInformationKeys']>;
 
         const firstCardAtStartPrivateInformationId = `${Math.floor(Math.random() * 10000)}`;
-        this.addToPrivateInformation(firstCardAtStartPrivateInformationId, firstCardAtStart);
+        this.setKeyPrivateInformation(firstCardAtStartPrivateInformationId, firstCardAtStart);
         this.firstCardAtStart = firstCardAtStartPrivateInformationId;
 
         const lastCardAtStartPrivateInformationId = `${Math.floor(Math.random() * 10000)}`; //todo: check so that is not same as above
-        this.addToPrivateInformation(lastCardAtStartPrivateInformationId, lastCardAtStart);
+        this.setKeyPrivateInformation(lastCardAtStartPrivateInformationId, lastCardAtStart);
         this.lastCardAtStart = lastCardAtStartPrivateInformationId;
     }
 
-    addToPrivateInformation(key: string, value: Card): void {
+    setKeyPrivateInformation(key: string, value: Card): void {
         if (this.privateInformation[key]) throw new Error('privateInformation key already set');
         this.privateInformation[key] = value;
         this.privateInformationKeys.push(key);

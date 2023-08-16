@@ -156,7 +156,7 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, han
             privateInformationId = `${Math.floor(Math.random() * 10000)}`;
         } while (game.currentActivePlayer.privateInformationKeys.includes(privateInformationId));
 
-        game.currentActivePlayer.addToPrivateInformation(privateInformationId, card);
+        game.currentActivePlayer.setKeyPrivateInformation(privateInformationId, card);
 
         return {
             ...newAction,
