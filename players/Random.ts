@@ -71,7 +71,7 @@ export class Random extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
     ): boolean {
-        return Math.random() < 0.2;
+        return Math.random() < 0.05;
     }
 
     acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
