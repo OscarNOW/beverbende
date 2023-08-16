@@ -71,7 +71,7 @@ export class Debug extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
     ): boolean {
-        return false;
+        return Math.random() < 0.2;
     }
 
     acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
