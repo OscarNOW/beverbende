@@ -172,7 +172,7 @@ function sortCards(game: Game, handCards: handCards): handCards {
     return [...handCards].sort((a, b) => ranking.indexOf(a) - ranking.indexOf(b));
 }
 
-function getAverageCard(game: Game) { //todo: test if this returns 5
+function getAverageCard(game: Game) {
     const cards: number[] =
         (game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[])
             .map(card => card.value);
