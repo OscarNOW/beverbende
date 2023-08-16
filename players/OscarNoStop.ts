@@ -1,3 +1,5 @@
+const stopRound = 50;
+
 import { ActionCard, ActivePlayer, Card, Player, ValueCard, action, privateInformation } from '../src/statics';
 import { Game } from '../src/index';
 
@@ -120,8 +122,7 @@ export class OscarNoStop extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
     ): boolean {
-        //todo-imp: implement
-        return Math.random() < 0.2;
+        return previousActions.length >= stopRound
     }
 
     acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
