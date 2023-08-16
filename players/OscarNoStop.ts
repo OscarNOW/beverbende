@@ -94,20 +94,23 @@ export class OscarNoStop extends Player {
             else
                 throw new Error(`Unknown action: "${drawnCard.action}"`)
         else if (drawnCard.isActionCard === false) //todo-imp: implement
-            if (canDisposeValueCard)
-                return {
-                    performer: activePlayer,
-                    type: 'dispose',
-                    drawnCardLocation: 'dispose',
-                    drawnCard
-                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
-            else
+            if (!canDisposeValueCard)
                 return {
                     performer: activePlayer,
                     type: 'use',
                     drawnCardLocation: 'hand',
                     cardSlot: activePlayer.hand[0]
                 } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
+            else {
+                //todo-imp: sometimes also use the card?
+
+                return {
+                    performer: activePlayer,
+                    type: 'dispose',
+                    drawnCardLocation: 'dispose',
+                    drawnCard
+                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
+            }
         else
             throw new Error(`Unknown isActionCard: "${drawnCard.isActionCard}"`)
     }
@@ -118,6 +121,7 @@ export class OscarNoStop extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
     ): boolean {
+        //todo-imp: implement
         return Math.random() < 0.2;
     }
 
@@ -130,6 +134,7 @@ export class OscarNoStop extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
     ) {
+        //todo-imp: implement
         return true;
     }
 
