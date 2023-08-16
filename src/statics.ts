@@ -171,7 +171,7 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
         drawnCard: drawnCard;
 
         cardSlot: CardSlot<performer>;
-        privateInformationId: performer['privateInformationKeys'][number]
+        privateInformationId: stage extends 'new' ? never : performer['privateInformationKeys'][number]
     } : never) |
 
     ('extraDraw' extends drawnCard['action'] ? {
