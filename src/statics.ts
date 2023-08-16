@@ -100,6 +100,7 @@ export class ActivePlayer {
     constructor(player: Player) {
         this.player = player;
         this.hand = [];
+        this.privateInformation = {} as privateInformation<this['privateInformationKeys']>;
     }
 
     addToPrivateInformation(key: string, value: Card): void {
