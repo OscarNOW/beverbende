@@ -61,7 +61,7 @@ export class Game {
         if (this.lastRoundCaller !== null && this.currentActivePlayer === this.lastRoundCaller)
             return this.finish();
 
-        let action = createAction(this, this.addDisposePileToDeck, this.handCards, this.replaceHandCard, drawnCard, true);
+        let action = createAction(this, this.addDisposePileToDeck.bind(this), this.handCards, this.replaceHandCard.bind(this), drawnCard, true);
 
         this.previousActions.push(action);
 
