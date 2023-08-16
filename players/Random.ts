@@ -3,7 +3,7 @@ import { Game } from '../src/index';
 
 export class Random extends Player {
     constructor() {
-        super('Debug');
+        super('Random');
     }
 
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
