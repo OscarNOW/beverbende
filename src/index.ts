@@ -142,7 +142,11 @@ function createAction<canDisposeValueCard extends boolean>(game: Game, addDispos
 function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>, drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'current'> {
     if (newAction.type === 'look') {
         const card = handCards[newAction.cardSlot.handCardId];
-        const privateInformationId = `${Math.floor(Math.random() * 10000)}`;
+
+        let privateInformationId: string;
+        do {
+            privateInformationId = `${Math.floor(Math.random() * 10000)}`;
+        } while (game.currentActivePlayer.privateInformationKeys.includes(privateInformationId));
 
         game.currentActivePlayer.addToPrivateInformation(privateInformationId, card);
 
