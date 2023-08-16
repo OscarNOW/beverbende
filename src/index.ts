@@ -164,7 +164,9 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, han
 }
 
 function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
-    if (currentAction.type === 'extraDraw' && currentAction.drawnCard.action === 'extraDraw') {
+    if (currentAction.type !== 'extraDraw' || currentAction.drawnCard.action !== 'extraDraw')
+        return currentAction as action<ActivePlayer, Card, canDisposeValueCard, 'finished'>;
+    else {
         if (game.deck.length === 0) addDisposePileToDeck();
         const firstExtraCard = game.deck.pop();
 
