@@ -25,6 +25,7 @@ export class Game {
         this.lastRoundCaller = null;
         this.handCards = {};
         this.previousActions = [];
+        this.disposePile = [];
 
         this.deck = shuffle(cards);
 
@@ -161,6 +162,11 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, han
 }
 
 function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
+    if (currentAction.drawnCardLocation === 'dispose')
+        game.disposePile.push(currentAction.drawnCard);
+    else if (currentAction.type === 'use')
+        game.disposePile.push(currentAction.disposedCard);
+
     if (currentAction.type !== 'extraDraw' || currentAction.drawnCard.action !== 'extraDraw')
         return currentAction as action<ActivePlayer, Card, canDisposeValueCard, 'finished'>;
     else {
