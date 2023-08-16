@@ -20,25 +20,7 @@ export class OscarNoStop extends Player {
         disposePile: Card[],
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
-        const activePlayerInfo: WeakMap<ActivePlayer, {
-            handCards: handCards;
-        }> = new WeakMap();
-
-        if (!activePlayerInfo.has(activePlayer))
-            activePlayerInfo.set(activePlayer, { handCards: Array(game.handSize).fill('unknown') });
-
-        activePlayerInfo.get(activePlayer).handCards[0] =
-            privateInformation[activePlayer.firstCardAtStart].isActionCard === true ? 'action' :
-                (privateInformation[activePlayer.firstCardAtStart] as ValueCard<number>).value;
-
-        activePlayerInfo.get(activePlayer).handCards[activePlayerInfo.get(activePlayer).handCards.length - 1] =
-            privateInformation[activePlayer.lastCardAtStart].isActionCard === true ? 'action' :
-                (privateInformation[activePlayer.lastCardAtStart] as ValueCard<number>).value;
-
-        for (const action of previousActions) {
-            if (!activePlayerInfo.has(action.performer))
-                activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
-        }
+        const activePlayerInfo = getActivePlayerInfo(game, activePlayer, previousActions, privateInformation);
 
         if (drawnCard.isActionCard)
             if (drawnCard.action === 'extraDraw')
@@ -154,6 +136,30 @@ export class OscarNoStop extends Player {
         return true;
     }
 
+}
+
+function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, previousActions: action<ActivePlayer, Card, true, 'finished'>[], privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
+    const activePlayerInfo: WeakMap<ActivePlayer, {
+        handCards: handCards;
+    }> = new WeakMap();
+
+    if (!activePlayerInfo.has(activePlayer))
+        activePlayerInfo.set(activePlayer, { handCards: Array(game.handSize).fill('unknown') });
+
+    activePlayerInfo.get(activePlayer).handCards[0] =
+        privateInformation[activePlayer.firstCardAtStart].isActionCard === true ? 'action' :
+            (privateInformation[activePlayer.firstCardAtStart] as ValueCard<number>).value;
+
+    activePlayerInfo.get(activePlayer).handCards[activePlayerInfo.get(activePlayer).handCards.length - 1] =
+        privateInformation[activePlayer.lastCardAtStart].isActionCard === true ? 'action' :
+            (privateInformation[activePlayer.lastCardAtStart] as ValueCard<number>).value;
+
+    for (const action of previousActions) {
+        if (!activePlayerInfo.has(action.performer))
+            activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
+    }
+
+    return activePlayerInfo;
 }
 
 function findLowestCardIndex(game: Game, handCards: handCards): number {
