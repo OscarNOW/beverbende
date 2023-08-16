@@ -145,10 +145,6 @@ function findLowestCardIndex(game: Game, handCards: handCards): number {
     return handCards.indexOf(sortedHandCards[0]);
 }
 
-function findHighestCardIndex(game: Game, handCards: handCards): number {
-    return handCards.indexOf(getHighestHandCard(game, handCards));
-}
-
 function getHighestHandCard(game: Game, handCards: handCards): handCards[number] {
     const sortedHandCards = sortCards(game, handCards);
     return sortedHandCards[sortedHandCards.length - 1];
