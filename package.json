@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "A simulation of the dutch game \"beverbende\" used for statistics",
   "main": "dist/.",
+  "engines": {
+    "node": "20.x.x"
+  },
   "scripts": {
     "do": "npm run build && npm run start",
     "build": "npx tsc",
