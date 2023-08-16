@@ -139,7 +139,7 @@ export class OscarNoStop extends Player {
 }
 
 function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, previousActions: action<ActivePlayer, Card, true, 'finished'>[], privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
-    const averageCard = getAverageCard(game);
+    const averageCardValue = getAverageCard(game);
 
     const activePlayerInfo: WeakMap<ActivePlayer, {
         handCards: handCards;
@@ -161,8 +161,17 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
             activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
 
         if (action.type === 'dispose') {
-            if (action.drawnCard.value <= averageCard)
+            if (action.drawnCard.value <= averageCardValue)
                 activePlayerInfo.get(activePlayer).handCards = activePlayerInfo.get(activePlayer).handCards.map(handCard => handCard === 'known' ? 'good' : handCard);
+        } else if (action.type === 'use') { //todo: check if this is correct
+            activePlayerInfo.get(activePlayer).handCards = activePlayerInfo.get(activePlayer).handCards.map(handCard => handCard === 'good' ? 'known' : handCard); //todo: should "known" maybe be "unknown" here? and should this line be here at all?
+
+            let disposedCardValue: number;
+            if (action.disposedCard.isActionCard === true) disposedCardValue = averageCardValue;
+            else disposedCardValue = (action.disposedCard as ValueCard<number>).value;
+
+            if (disposedCardValue <= averageCardValue)
+                activePlayerInfo.get(activePlayer).handCards[activePlayer.hand.indexOf(action.cardSlot)] = 'good'; //todo-imp: fix this error
         } else {
             //todo-imp
         }
