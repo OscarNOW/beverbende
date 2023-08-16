@@ -151,12 +151,7 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, han
     if (newAction.type === 'look') {
         const card = handCards[newAction.cardSlot.handCardId];
 
-        let privateInformationId: string;
-        do {
-            privateInformationId = `${Math.floor(Math.random() * 10000)}`;
-        } while (game.currentActivePlayer.privateInformationKeys.includes(privateInformationId));
-
-        game.currentActivePlayer.setKeyPrivateInformation(privateInformationId, card);
+        const privateInformationId = game.currentActivePlayer.addToPrivateInformation(card);
 
         return {
             ...newAction,
