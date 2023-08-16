@@ -24,7 +24,7 @@ export class Debug extends Player {
                     drawnCardLocation: 'dispose',
                     drawnCard: drawnCard,
                     actions: []
-                }
+                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
             else if (drawnCard.action === 'look')
                 return {
                     performer: activePlayer,
@@ -33,7 +33,7 @@ export class Debug extends Player {
                     drawnCard,
 
                     cardSlot: activePlayer.hand[0]
-                }
+                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
             else if (drawnCard.action === 'switch')
                 return {
                     performer: activePlayer,
@@ -43,7 +43,7 @@ export class Debug extends Player {
 
                     ownCardSlot: activePlayer.hand[0],
                     otherCardSlot: game.activePlayers.find(p => p !== activePlayer).hand[0]
-                }
+                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
             else
                 throw new Error(`Unknown action: "${drawnCard.action}"`)
         else if (drawnCard.isActionCard === false)
@@ -53,14 +53,14 @@ export class Debug extends Player {
                     type: 'dispose',
                     drawnCardLocation: 'dispose',
                     drawnCard
-                }
+                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
             else
                 return {
                     performer: activePlayer,
                     type: 'use',
                     drawnCardLocation: 'hand',
                     cardSlot: activePlayer.hand[0]
-                }
+                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
         else
             throw new Error(`Unknown isActionCard: "${drawnCard.isActionCard}"`)
     }
