@@ -4,10 +4,10 @@
   "description": "A simulation of the dutch game \"beverbende\" used for statistics",
   "main": "dist/.",
   "scripts": {
-    "do": "npx tsc && node dist/.",
+    "do": "npm run build && npm run start",
     "build": "npx tsc",
     "install": "npm i",
-    "start": "node dist/."
+    "start": "node --enable-source-maps dist/."
   },
   "author": "Oscar",
   "license": "ISC",
