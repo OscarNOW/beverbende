@@ -24,6 +24,7 @@ export class Game {
         this.activePlayerPoints = null;
         this.lastRoundCaller = null;
         this.handCards = {};
+        this.previousActions = [];
 
         this.deck = shuffle(cards);
 
