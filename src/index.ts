@@ -64,7 +64,7 @@ export class Game {
         this.previousActions.push(action);
 
         if (this.state !== 'lastRound') {
-            const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.state === 'lastRound', this.disposePile);
+            const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.disposePile);
             if (declaresLastRound) this.lastRound(this.currentActivePlayer);
         }
     }
