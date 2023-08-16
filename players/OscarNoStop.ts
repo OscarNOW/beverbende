@@ -161,7 +161,7 @@ function sortCards(game: Game, handCards: handCards): handCards {
         'unknown',
         'action',
         'bad',
-        ...Array(highestCard - averageCard + 1).fill(null).map((_, i) => i + averageCard)
+        ...Array(highestCard - averageCard).fill(null).map((_, i) => i + averageCard + 1)
     ];
 
     console.log(ranking)
