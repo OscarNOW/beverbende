@@ -23,7 +23,6 @@ export class OscarNoStop extends Player {
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
         //todo-imp: implement setting of activePlayerInfo based on previousActions
-        const averageCard = getAverageCard(game);
 
         if (drawnCard.isActionCard)
             if (drawnCard.action === 'extraDraw')
