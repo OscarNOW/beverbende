@@ -1,3 +1,5 @@
+import { Game } from './index'; //todo: circular import?
+
 export type actionCardActionName = 'switch' | 'look' | 'extraDraw';
 export class ActionCard<currentAction extends actionCardActionName> {
     action: currentAction;
@@ -48,7 +50,8 @@ export class Player {
         previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         isLastRound: boolean,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[]
+        disposePile: Card[], //todo: remove
+        game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
         throw new Error('Extend this class and implement your own method');
     };
@@ -58,6 +61,7 @@ export class Player {
         previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
+        //todo: add game
     ): boolean {
         throw new Error('Extend this class and implement your own method');
     };
@@ -70,6 +74,7 @@ export class Player {
         currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
+        //todo: add game
     ): boolean {
         throw new Error('Extend this class and implement your own method');
     };
@@ -110,9 +115,10 @@ export class ActivePlayer {
         canDisposeValueCard: canDisposeValueCard,
         previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         isLastRound: boolean,
-        disposePile: Card[]
+        disposePile: Card[],
+        game: Game
     ): action<this, drawnCard, canDisposeValueCard, 'new'> {
-        return this.player.performAction(drawnCard, canDisposeValueCard, this, previousActions, isLastRound, this.privateInformation, disposePile);
+        return this.player.performAction(drawnCard, canDisposeValueCard, this, previousActions, isLastRound, this.privateInformation, disposePile, game);
     };
 
     declareLastRound(

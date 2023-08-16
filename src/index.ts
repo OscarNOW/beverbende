@@ -128,7 +128,7 @@ export class Game {
 
 function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card, canDisposeValueCard: canDisposeValueCard): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
-        = game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, this.previousActions, game.state === 'lastRound', game.disposePile);
+        = game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, this.previousActions, game.state === 'lastRound', game.disposePile, game);
 
     if (newAction.performer !== game.currentActivePlayer)
         throw new Error('Performer of returned action isn\'t self');
