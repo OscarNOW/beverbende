@@ -254,7 +254,8 @@ function sum(array: number[]): number {
 }
 
 function shuffle<element>(array: element[]): element[] {
-    let currentIndex = array.length
+    let shuffled = [...array];
+    let currentIndex = shuffled.length
 
     // While there remain elements to shuffle.
     while (currentIndex !== 0) {
@@ -264,9 +265,9 @@ function shuffle<element>(array: element[]): element[] {
         currentIndex--;
 
         // And swap it with the current element.
-        [array[currentIndex], array[randomIndex]] = [
-            array[randomIndex], array[currentIndex]];
+        [shuffled[currentIndex], shuffled[randomIndex]] = [
+            shuffled[randomIndex], shuffled[currentIndex]];
     }
 
-    return array;
+    return shuffled;
 };
