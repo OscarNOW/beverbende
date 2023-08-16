@@ -1,4 +1,4 @@
-import { ActionCard, ActivePlayer, Card, Player, action, privateInformation } from '../src/statics';
+import { ActionCard, ActivePlayer, Card, Player, ValueCard, action, privateInformation } from '../src/statics';
 import { Game } from '../src/index';
 
 type handCards = ('action' | 'good' | 'bad' | 'unknown' | number)[];
@@ -173,9 +173,17 @@ function sortCards(game: Game, handCards: handCards): handCards {
 }
 
 function getAverageCard(game: Game) {
-    return 5; //todo: actually take average based on game.cards
+    const cards: number[] =
+        (game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[])
+            .map(card => card.value);
+
+    return sum(cards) / cards.length;
 }
 
 function getHighestCard(game: Game) {
     return 9; //todo: actually take average based on game.cards
+}
+
+function sum(array: number[]): number {
+    return array.reduce((a, b) => a + b, 0);
 }
