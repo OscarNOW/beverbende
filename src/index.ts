@@ -63,8 +63,10 @@ export class Game {
 
         this.previousActions.push(action);
 
-        const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.state === 'lastRound', this.disposePile);
-        if (declaresLastRound) this.lastRound(this.currentActivePlayer);
+        if (this.state !== 'lastRound') {
+            const declaresLastRound = this.currentActivePlayer.declareLastRound(this.previousActions, this.state === 'lastRound', this.disposePile);
+            if (declaresLastRound) this.lastRound(this.currentActivePlayer);
+        }
     }
 
     private addDisposePileToDeck() {
