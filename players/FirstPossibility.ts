@@ -1,9 +1,9 @@
 import { ActionCard, ActivePlayer, Card, Player, action, privateInformation } from '../src/statics';
 import { Game } from '../src/index';
 
-export class Random extends Player {
+export class FirstPossibility extends Player {
     constructor() {
-        super('Random');
+        super('FirstPossibility');
     }
 
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
