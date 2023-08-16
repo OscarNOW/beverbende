@@ -6,7 +6,7 @@ import { OscarNoStop } from './players/OscarNoStop';
 const aPoints = [];
 const bPoints = [];
 
-for (let ii = 0; ii < 10000; ii++) {
+for (let ii = 0; ii < 100000; ii++) {
     const game = new Game([new FirstPossibility(), new OscarNoStop()]);
 
     while (game.state !== 'finished')
@@ -16,8 +16,8 @@ for (let ii = 0; ii < 10000; ii++) {
     bPoints.push(game.activePlayerPoints[1]);
 }
 
-console.log(sum(aPoints) / aPoints.length);
-console.log(sum(bPoints) / bPoints.length);
+console.log(Math.round(sum(aPoints) / aPoints.length));
+console.log(Math.round(sum(bPoints) / bPoints.length));
 
 function sum(array: number[]): number {
     return array.reduce((a, b) => a + b, 0);
