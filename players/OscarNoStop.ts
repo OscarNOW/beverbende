@@ -94,24 +94,26 @@ export class OscarNoStop extends Player {
             }
             else
                 throw new Error(`Unknown action: "${drawnCard.action}"`)
-        else if (drawnCard.isActionCard === false) //todo-imp: implement
-            if (!canDisposeValueCard)
+        else if (drawnCard.isActionCard === false) {
+            const handCards = activePlayerInfo.get(activePlayer).handCards;
+            const ourHighestCard = getHighestHandCard(game, handCards);
+
+            //                                           ourHighestCard >= drawnCard.value
+            if ((!canDisposeValueCard) || compareHandCards(game, ourHighestCard, drawnCard.value) >= 0)
                 return {
                     performer: activePlayer,
                     type: 'use',
                     drawnCardLocation: 'hand',
-                    cardSlot: activePlayer.hand[0]
+                    cardSlot: activePlayer.hand[activePlayerInfo.get(activePlayer).handCards.indexOf(ourHighestCard)]
                 } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
-            else {
-                //todo-imp: sometimes also use the card?
 
-                return {
-                    performer: activePlayer,
-                    type: 'dispose',
-                    drawnCardLocation: 'dispose',
-                    drawnCard
-                } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
-            }
+            return {
+                performer: activePlayer,
+                type: 'dispose',
+                drawnCardLocation: 'dispose',
+                drawnCard
+            } as action<activePlayer, drawnCard, canDisposeValueCard, 'new'> //todo: remove
+        }
         else
             throw new Error(`Unknown isActionCard: "${drawnCard.isActionCard}"`)
     }
@@ -141,16 +143,20 @@ export class OscarNoStop extends Player {
 }
 
 function findLowestCardIndex(game: Game, handCards: handCards): number {
-    const sortedHandCards = sortCards(game, handCards);
+    const sortedHandCards = sortHandCards(game, handCards);
     return handCards.indexOf(sortedHandCards[0]);
 }
 
 function getHighestHandCard(game: Game, handCards: handCards): handCards[number] {
-    const sortedHandCards = sortCards(game, handCards);
+    const sortedHandCards = sortHandCards(game, handCards);
     return sortedHandCards[sortedHandCards.length - 1];
 }
 
-function sortCards(game: Game, handCards: handCards): handCards {
+function sortHandCards(game: Game, handCards: handCards): handCards {
+    return [...handCards].sort((a, b) => compareHandCards(game, a, b));
+}
+
+function compareHandCards(game: Game, a: handCards[number], b: handCards[number]) {
     const averageCard = getAverageCard(game);
     const highestCard = getHighestCard(game);
 
@@ -164,9 +170,7 @@ function sortCards(game: Game, handCards: handCards): handCards {
         ...Array(highestCard - averageCard).fill(null).map((_, i) => i + averageCard + 1)
     ];
 
-    console.log(ranking)
-
-    return [...handCards].sort((a, b) => ranking.indexOf(a) - ranking.indexOf(b));
+    return ranking.indexOf(a) - ranking.indexOf(b);
 }
 
 function getAverageCard(game: Game) {
