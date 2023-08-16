@@ -6,7 +6,7 @@ export class Game {
     activePlayers: ActivePlayer[];
     handSize: number;
 
-    deck: Card[];
+    deck: Card[]; //todo: make private
     disposePile: Card[];
     previousActions: action<ActivePlayer, Card, true, 'finished'>[];
     currentActivePlayer: ActivePlayer;
