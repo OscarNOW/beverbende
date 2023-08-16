@@ -1,7 +1,7 @@
 import { Game } from './src/index';
-import { Debug as DebugPlayer } from './players/Debug';
+import { Random } from './players/Random';
 
-const game = new Game([new DebugPlayer(), new DebugPlayer()]);
+const game = new Game([new Random(), new Random()]);
 
 while (game.state !== 'finished')
     game.nextAction();

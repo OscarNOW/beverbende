@@ -1,7 +1,7 @@
 import { ActionCard, ActivePlayer, Card, Player, action, privateInformation } from '../src/statics';
 import { Game } from '../src/index';
 
-export class Debug extends Player {
+export class Random extends Player {
     constructor() {
         super('Debug');
     }
