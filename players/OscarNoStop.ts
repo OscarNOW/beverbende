@@ -139,8 +139,6 @@ export class OscarNoStop extends Player {
 }
 
 function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, previousActions: action<ActivePlayer, Card, true, 'finished'>[], privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
-    const averageCardValue = getAverageCard(game);
-
     const activePlayerInfo: WeakMap<ActivePlayer, {
         handCards: handCards;
     }> = new WeakMap();
@@ -156,47 +154,52 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
         privateInformation[activePlayer.lastCardAtStart].isActionCard === true ? 'action' :
             (privateInformation[activePlayer.lastCardAtStart] as ValueCard<number>).value;
 
-    for (const action of previousActions) {
-        if (!activePlayerInfo.has(action.performer))
-            activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
-
-        if (action.type === 'dispose') {
-            if (action.drawnCard.value <= averageCardValue)
-                activePlayerInfo.get(action.performer).handCards = activePlayerInfo.get(action.performer).handCards.map(handCard => handCard === 'known' ? 'good' : handCard);
-        } else if (action.type === 'use') {
-            activePlayerInfo.get(action.performer).handCards = activePlayerInfo.get(action.performer).handCards.map(handCard => handCard === 'good' ? 'known' : handCard);
-
-            let disposedCardValue: number;
-            if (action.disposedCard.isActionCard === true) disposedCardValue = averageCardValue;
-            else disposedCardValue = (action.disposedCard as ValueCard<number>).value;
-
-            if (disposedCardValue <= averageCardValue)
-                activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'good';
-        } else if (action.type === 'switch') {
-            if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] === 'known')
-                activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = 'bad';
-
-            if (activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] === 'known')
-                activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = 'good';
-
-            //swap the handCard information because of the switch
-            const own = activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)];
-            const other = activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)];
-
-            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = other;
-            activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = own;
-        } else if (action.type === 'look') {
-            if (action.performer === activePlayer)
-                activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = privateInformation[action.privateInformationId];
-
-            else if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] === 'unknown')
-                activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'known';
-        } else if (action.type === 'extraDraw') {
-            //todo-imp
-        }
-    }
+    for (const action of previousActions)
+        updateActivePlayerInfo(game, activePlayer, privateInformation, activePlayerInfo, action);
 
     return activePlayerInfo;
+}
+
+function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, privateInformation: privateInformation<activePlayer['privateInformationKeys']>, activePlayerInfo: WeakMap<ActivePlayer, { handCards: handCards }>, action: action<ActivePlayer, Card, true, 'finished'>) {
+    const averageCardValue = getAverageCard(game);
+
+    if (!activePlayerInfo.has(action.performer))
+        activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
+
+    if (action.type === 'dispose') {
+        if (action.drawnCard.value <= averageCardValue)
+            activePlayerInfo.get(action.performer).handCards = activePlayerInfo.get(action.performer).handCards.map(handCard => handCard === 'known' ? 'good' : handCard);
+    } else if (action.type === 'use') {
+        activePlayerInfo.get(action.performer).handCards = activePlayerInfo.get(action.performer).handCards.map(handCard => handCard === 'good' ? 'known' : handCard);
+
+        let disposedCardValue: number;
+        if (action.disposedCard.isActionCard === true) disposedCardValue = averageCardValue;
+        else disposedCardValue = (action.disposedCard as ValueCard<number>).value;
+
+        if (disposedCardValue <= averageCardValue)
+            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'good';
+    } else if (action.type === 'switch') {
+        if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] === 'known')
+            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = 'bad';
+
+        if (activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] === 'known')
+            activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = 'good';
+
+        //swap the handCard information because of the switch
+        const own = activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)];
+        const other = activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)];
+
+        activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = other;
+        activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = own;
+    } else if (action.type === 'look') {
+        if (action.performer === activePlayer)
+            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = privateInformation[action.privateInformationId];
+
+        else if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] === 'unknown')
+            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'known';
+    } else if (action.type === 'extraDraw') {
+        //todo-imp
+    }
 }
 
 function findIndex(array: any[], predicate: (value: any, index: number, obj: any[]) => boolean): number | null {
