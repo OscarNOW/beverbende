@@ -126,8 +126,25 @@ export class OscarNoStop extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         game: Game
     ) {
-        //todo: always except extraDraw card
-        //todo-imp: implement
+        const averageCard = getAverageCard(game);
+        const isSecondCard = currentAction.actions.length === 1 && currentAction.actions[0].accepted === false;
+
+        if (drawnCard.isActionCard === true) {
+            if (drawnCard.action === 'extraDraw')
+                return true;
+            else if (drawnCard.action === 'look')
+                return isSecondCard; //todo: might be good to also except when is first card?
+            else if (drawnCard.action === 'switch') {
+                //todo-imp: implement
+                return isSecondCard;
+            }
+        } else if (drawnCard.isActionCard === false) {
+            if ((!isSecondCard) && drawnCard.value > averageCard)
+                return false;
+
+            //todo-imp: return if card is lower than any card that we have
+            return true; //todo-imp: remove and implement above
+        }
         return true;
     }
 
