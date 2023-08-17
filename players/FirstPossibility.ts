@@ -10,10 +10,7 @@ export class FirstPossibility extends Player {
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[],
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
         if (drawnCard.isActionCard)
@@ -67,9 +64,8 @@ export class FirstPossibility extends Player {
 
     declareLastRound<activePlayer extends ActivePlayer>(
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[]
+        game: Game
     ): boolean {
         return Math.random() < 0.05;
     }
@@ -77,11 +73,9 @@ export class FirstPossibility extends Player {
     acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
         drawnCard: drawnCard,
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
         currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[]
+        game: Game
     ) {
         return true;
     }

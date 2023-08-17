@@ -14,11 +14,10 @@ export class OscarNoStop extends Player {
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
-        const activePlayerInfo = getActivePlayerInfo(game, activePlayer, previousActions, privateInformation);
+        const activePlayerInfo = getActivePlayerInfo(game, activePlayer, privateInformation);
 
         if (drawnCard.isActionCard)
             if (drawnCard.action === 'extraDraw')
@@ -114,21 +113,18 @@ export class OscarNoStop extends Player {
 
     declareLastRound<activePlayer extends ActivePlayer>(
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[]
+        game: Game
     ): boolean {
-        return previousActions.length >= stopRound
+        return game.previousActions.length >= stopRound
     }
 
     acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
         drawnCard: drawnCard,
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
         currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[]
+        game: Game
     ) {
         //todo: always except extraDraw card
         //todo-imp: implement
@@ -137,7 +133,7 @@ export class OscarNoStop extends Player {
 
 }
 
-function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, previousActions: action<ActivePlayer, Card, true, 'finished'>[], privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
+function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
     const activePlayerInfo: WeakMap<ActivePlayer, {
         handCards: handCards;
     }> = new WeakMap();
@@ -153,7 +149,7 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
         privateInformation[activePlayer.lastCardAtStart].isActionCard === true ? 'action' :
             (privateInformation[activePlayer.lastCardAtStart] as ValueCard<number>).value;
 
-    for (const action of previousActions)
+    for (const action of game.previousActions)
         updateActivePlayerInfo(game, activePlayer, privateInformation, activePlayerInfo, action);
 
     return activePlayerInfo;

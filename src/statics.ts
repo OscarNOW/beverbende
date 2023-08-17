@@ -49,7 +49,6 @@ export class Player {
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
@@ -58,10 +57,8 @@ export class Player {
 
     declareLastRound<activePlayer extends ActivePlayer>(
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[]
-        //todo: add game
+        game: Game
     ): boolean {
         throw new Error('Extend this class and implement your own method');
     };
@@ -69,12 +66,9 @@ export class Player {
     acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
         drawnCard: drawnCard,
         activePlayer: activePlayer,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
         currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[]
-        //todo: add game
+        game: Game
     ): boolean {
         throw new Error('Extend this class and implement your own method');
     };
@@ -129,27 +123,23 @@ export class ActivePlayer {
     performAction<canDisposeValueCard extends boolean, drawnCard extends Card>(
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
         game: Game
     ): action<this, drawnCard, canDisposeValueCard, 'new'> {
-        return this.player.performAction(drawnCard, canDisposeValueCard, this, previousActions, this.privateInformation, game);
+        return this.player.performAction(drawnCard, canDisposeValueCard, this, this.privateInformation, game);
     };
 
     declareLastRound(
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        disposePile: Card[]
+        game: Game
     ): boolean {
-        return this.player.declareLastRound(this, previousActions, this.privateInformation, disposePile);
+        return this.player.declareLastRound(this, this.privateInformation, game);
     }
 
     acceptExtraDrawCard<drawnCard extends Card>(
         drawnCard: drawnCard,
-        previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
         currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
-        disposePile: Card[]
+        game: Game
     ): boolean {
-        return this.player.acceptExtraDrawCard(drawnCard, this, previousActions, isLastRound, currentAction, this.privateInformation, disposePile);
+        return this.player.acceptExtraDrawCard(drawnCard, this, currentAction, this.privateInformation, game);
     }
 }
 
