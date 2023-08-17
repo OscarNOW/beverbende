@@ -190,7 +190,15 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
 
         actions:
         stage extends 'new' ? [] : (
-            (stage extends 'current' ? [] : never) | //todo: test if never works here
+            (stage extends 'current' ?
+                [] |
+                [
+                    {
+                        accepted: false;
+                        action: disposeAction<performer, Card>;
+                    }
+                ]
+                : never) |
             [
                 {
                     accepted: true;
