@@ -34,11 +34,11 @@ export class OscarNoStop extends Player {
             else if (drawnCard.action === 'look') {
                 let index: number;
 
-                index ??= activePlayerInfo.get(activePlayer).handCards.findIndex(c => c === 'unknown');
-                index ??= activePlayerInfo.get(activePlayer).handCards.findIndex(c => c === 'bad');
-                index ??= activePlayerInfo.get(activePlayer).handCards.findIndex(c => c === 'good');
-                index ??= activePlayerInfo.get(activePlayer).handCards.findIndex(c => typeof c === 'number');
-                index ??= activePlayerInfo.get(activePlayer).handCards.findIndex(c => c === 'action');
+                index ??= findIndex(activePlayerInfo.get(activePlayer).handCards, c => c === 'unknown');
+                index ??= findIndex(activePlayerInfo.get(activePlayer).handCards, c => c === 'bad');
+                index ??= findIndex(activePlayerInfo.get(activePlayer).handCards, c => c === 'good');
+                index ??= findIndex(activePlayerInfo.get(activePlayer).handCards, c => typeof c === 'number');
+                index ??= findIndex(activePlayerInfo.get(activePlayer).handCards, c => c === 'action');
                 index ??= 0;
 
                 return {
@@ -179,6 +179,14 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
 
     return activePlayerInfo;
 }
+
+function findIndex(array: any[], predicate: (value: any, index: number, obj: any[]) => boolean): number | null {
+    const index = array.findIndex(predicate);
+    if (index === -1)
+        return null;
+    else
+        return index;
+};
 
 function findLowestCardIndex(game: Game, handCards: handCards): number {
     const sortedHandCards = sortHandCards(game, handCards);
