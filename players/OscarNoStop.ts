@@ -221,7 +221,7 @@ function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, a
 
 function setEmptyActivePlayerInfoValue(activePlayerInfo: WeakMap<ActivePlayer, { handCards: handCards }>, activePlayer: ActivePlayer, game: Game) {
     if (!activePlayerInfo.has(activePlayer))
-        activePlayerInfo.set(activePlayer, { handCards: Array(game.handSize).fill('unknown') });
+        activePlayerInfo.set(activePlayer, { handCards: ['known', ...Array(game.handSize - 2).fill('unknown'), 'known'] });
 }
 
 function findIndex(array: any[], predicate: (value: any, index: number, obj: any[]) => boolean): number | null {
