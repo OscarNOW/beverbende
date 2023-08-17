@@ -10,7 +10,8 @@ for (let jj = 1; jj <= 10; jj++) {
     console.log(`${jj}/10`);
 
     for (let ii = 0; ii < 2000; ii++) {
-        const game = new Game([new FirstPossibility(), new OscarNoStop()]);
+        // const game = new Game([new FirstPossibility(), new OscarNoStop()]);
+        const game = new Game([new OscarNoStop(), new OscarNoStop()]);
 
         while (game.state !== 'finished')
             game.nextAction();
@@ -20,8 +21,9 @@ for (let jj = 1; jj <= 10; jj++) {
     }
 }
 
-console.log(Math.round(sum(aPoints) / aPoints.length));
-console.log(Math.round(sum(bPoints) / bPoints.length));
+console.log([Math.min(...aPoints), Math.min(...bPoints)]);
+console.log([Math.round(sum(aPoints) / aPoints.length), Math.round(sum(bPoints) / bPoints.length)]);
+console.log([Math.max(...aPoints), Math.max(...bPoints)]);
 
 function sum(array: number[]): number {
     return array.reduce((a, b) => a + b, 0);
