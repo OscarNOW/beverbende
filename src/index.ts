@@ -29,6 +29,7 @@ export class Game {
         this.handCards = {};
         this.previousActions = [];
         this.disposePile = [];
+        this.deck = [];
 
         this.disposePile = shuffle(cards);
         this.addDisposePileToDeck();
