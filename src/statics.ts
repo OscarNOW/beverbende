@@ -1,4 +1,4 @@
-import { Game } from './index'; //todo: circular import?
+import { Game } from './index';
 
 export type actionCardActionName = 'switch' | 'look' | 'extraDraw';
 export class ActionCard<currentAction extends actionCardActionName> {
