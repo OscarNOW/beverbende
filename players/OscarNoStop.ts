@@ -133,6 +133,7 @@ export class OscarNoStop extends Player {
 
 }
 
+//todo: implement cache?
 function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
     const activePlayerInfo: WeakMap<ActivePlayer, {
         handCards: handCards;
@@ -242,6 +243,7 @@ function compareHandCards(game: Game, a: handCards[number], b: handCards[number]
     return ranking.indexOf(a) - ranking.indexOf(b);
 }
 
+//todo: implement cache
 function getAverageCard(game: Game) {
     const cards: number[] =
         (game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[])
@@ -250,6 +252,7 @@ function getAverageCard(game: Game) {
     return sum(cards) / cards.length;
 }
 
+//todo: implement cache
 function getHighestCard(game: Game) {
     return 9; //todo: actually take average based on game.cards
 }
