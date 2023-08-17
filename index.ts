@@ -6,14 +6,18 @@ import { OscarNoStop } from './players/OscarNoStop';
 const aPoints = [];
 const bPoints = [];
 
-for (let ii = 0; ii < 100000; ii++) {
-    const game = new Game([new FirstPossibility(), new OscarNoStop()]);
+for (let jj = 1; jj <= 10; jj++) {
+    console.log(`${jj}/10`);
 
-    while (game.state !== 'finished')
-        game.nextAction();
+    for (let ii = 0; ii < 2000; ii++) {
+        const game = new Game([new FirstPossibility(), new OscarNoStop()]);
 
-    aPoints.push(game.activePlayerPoints[0]);
-    bPoints.push(game.activePlayerPoints[1]);
+        while (game.state !== 'finished')
+            game.nextAction();
+
+        aPoints.push(game.activePlayerPoints[0]);
+        bPoints.push(game.activePlayerPoints[1]);
+    }
 }
 
 console.log(Math.round(sum(aPoints) / aPoints.length));
