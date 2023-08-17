@@ -28,20 +28,32 @@ function sum(array: number[]): number {
     return array.reduce((a, b) => a + b, 0);
 }
 
-const plotly = require('plotly');
-plotly('OscarNOW', require('../secret.json').plotly);
+// Create boxplot
+console.log();
+const plotly = require('plotly')('OscarNOW', require('../secret.json').plotly);
 
 const data = [
     {
-        y: aPoints,
+        y: bPoints,
         boxpoints: 'all',
-        jitter: 0.3,
-        pointpos: -1.8,
+        jitter: 0.2,
+        pointpos: 0,
         type: 'box'
     }
 ];
 const graphOptions = { filename: 'box-plot', fileopt: 'overwrite' };
 
-plotly.plot(data, graphOptions, function (err, msg) {
-    console.log(msg);
+plotly.plot(data, graphOptions, function (err: any, msg: {
+    streamStatus: undefined;
+    url: string;
+    message: string;
+    warning: string;
+    filename: string;
+    error: string;
+}) {
+    if (err) throw err;
+    else if (msg.error.length !== 0) throw msg.error;
+    else if (msg.warning.length !== 0) console.warn(msg.warning);
+
+    console.log(msg.url);
 });
