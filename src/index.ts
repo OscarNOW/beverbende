@@ -184,7 +184,10 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
 
         const firstExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
             firstExtraCard,
-            currentAction as action<ActivePlayer, ActionCard<'extraDraw'>, canDisposeValueCard, 'current'>,
+            {
+                ...currentAction,
+                drawnCard: currentAction.drawnCard as ActionCard<'extraDraw'>
+            },
             game
         );
 
@@ -213,7 +216,16 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
 
             const secondExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
                 firstExtraCard,
-                currentAction as action<ActivePlayer, ActionCard<'extraDraw'>, canDisposeValueCard, 'current'>,
+                {
+                    ...currentAction,
+                    drawnCard: currentAction.drawnCard as ActionCard<'extraDraw'>,
+                    actions: [
+                        {
+                            accepted: false,
+                            action: firstExtraCardDisposeAction
+                        }
+                    ]
+                },
                 game
             );
 
