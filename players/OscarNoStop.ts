@@ -296,9 +296,14 @@ function getAverageCard(game: Game) {
     return average;
 }
 
-//todo: implement cache
+const highestCardCache = new WeakMap<Game, number>();
 function getHighestCard(game: Game) {
-    return Math.max(...(game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[]).map(card => card.value));
+    if (highestCardCache.has(game))
+        return highestCardCache.get(game);
+
+    const max = Math.max(...(game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[]).map(card => card.value));
+    highestCardCache.set(game, max);
+    return max;
 }
 
 function sum(array: number[]): number {
