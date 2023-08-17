@@ -137,8 +137,32 @@ export class OscarNoStop extends Player {
             else if (drawnCard.action === 'look')
                 return isSecondCard; //todo: might be good to also except when is first card?
             else if (drawnCard.action === 'switch') {
-                //todo-imp: implement
-                return isSecondCard;
+                const otherActivePlayers = game.activePlayers.filter(p => p !== activePlayer);
+                if (otherActivePlayers.length === 0) throw new Error('There are no other activePlayers');
+
+                let ourLowestCard = activePlayerInfo.get(activePlayer).handCards[findLowestCardIndex(game, activePlayerInfo.get(activePlayer).handCards)];
+
+                let otherValue: handCards[number] | null = null;
+
+                for (const otherActivePlayer of otherActivePlayers) {
+                    if (!activePlayerInfo.has(otherActivePlayer)) continue;
+
+                    const otherHandCards = activePlayerInfo.get(otherActivePlayer).handCards;
+                    const highestOtherHandCard = getHighestHandCard(game, otherHandCards);
+
+                    if (otherValue === null || highestOtherHandCard > otherValue)
+                        otherValue = highestOtherHandCard;
+                }
+
+                // if (otherValue >= ourLowestCard)
+                if (compareHandCards(game, otherValue, ourLowestCard) >= 0)
+                    return false;
+
+                // if (otherValue >= averageCard)
+                if (compareHandCards(game, otherValue, averageCard) >= 0)
+                    return false;
+
+                return true;
             }
         } else if (drawnCard.isActionCard === false) {
             if ((!isSecondCard) && drawnCard.value > averageCard)
