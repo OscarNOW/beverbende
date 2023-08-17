@@ -275,7 +275,7 @@ function getAverageCard(game: Game) {
 
 //todo: implement cache
 function getHighestCard(game: Game) {
-    return 9; //todo: actually take average based on game.cards
+    return Math.max(...(game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[]).map(card => card.value));
 }
 
 function sum(array: number[]): number {
