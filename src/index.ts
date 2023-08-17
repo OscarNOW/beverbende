@@ -30,7 +30,8 @@ export class Game {
         this.previousActions = [];
         this.disposePile = [];
 
-        this.deck = shuffle(cards);
+        this.disposePile = shuffle(cards);
+        this.addDisposePileToDeck();
 
         if (this.deck.length < handSize * players.length)
             throw new Error('There are not enough cards for all the players');
@@ -91,6 +92,8 @@ export class Game {
 
         if (this.deck.length === 0)
             throw new Error('There are no cards left in the dispose pile for the deck');
+
+        this.disposePile.push(this.deck.pop());
     }
 
     private replaceHandCard(cardSlot: CardSlot<ActivePlayer>, newCard: Card): Card {
