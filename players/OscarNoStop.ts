@@ -132,6 +132,7 @@ export class OscarNoStop extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         disposePile: Card[]
     ) {
+        //todo: always except extraDraw card
         //todo-imp: implement
         return true;
     }
