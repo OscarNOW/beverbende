@@ -1,6 +1,6 @@
 const stopRound = 50;
 
-import { ActionCard, ActivePlayer, Card, Player, ValueCard, action, privateInformation } from '../src/statics';
+import { ActionCard, ActivePlayer, Card, Player, ValueCard, action, disposeAction, privateInformation } from '../src/statics';
 import { Game } from '../src/index';
 
 type handCards = ('action' | 'good' | 'bad' | 'unknown' | 'known' | number)[];
@@ -160,15 +160,16 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
     return activePlayerInfo;
 }
 
-function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, privateInformation: privateInformation<activePlayer['privateInformationKeys']>, activePlayerInfo: WeakMap<ActivePlayer, { handCards: handCards }>, action: action<ActivePlayer, Card, true, 'finished'>) {
+function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, privateInformation: privateInformation<activePlayer['privateInformationKeys']>, activePlayerInfo: WeakMap<ActivePlayer, { handCards: handCards }>, action: action<ActivePlayer, Card, true, 'finished'> | disposeAction<ActivePlayer, Card>) {
     const averageCardValue = getAverageCard(game);
 
     if (!activePlayerInfo.has(action.performer))
         activePlayerInfo.set(action.performer, { handCards: Array(game.handSize).fill('unknown') });
 
     if (action.type === 'dispose') {
-        if (action.drawnCard.value <= averageCardValue)
-            activePlayerInfo.get(action.performer).handCards = activePlayerInfo.get(action.performer).handCards.map(handCard => handCard === 'known' ? 'good' : handCard);
+        if (action.drawnCard.isActionCard === false)
+            if (action.drawnCard.value <= averageCardValue)
+                activePlayerInfo.get(action.performer).handCards = activePlayerInfo.get(action.performer).handCards.map(handCard => handCard === 'known' ? 'good' : handCard);
     } else if (action.type === 'use') {
         activePlayerInfo.get(action.performer).handCards = activePlayerInfo.get(action.performer).handCards.map(handCard => handCard === 'good' ? 'known' : handCard);
 
@@ -197,9 +198,9 @@ function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, a
 
         else if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] === 'unknown')
             activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'known';
-    } else if (action.type === 'extraDraw') {
-        //todo-imp
-    }
+    } else if (action.type === 'extraDraw')
+        for (const extraDrawAction of action.actions)
+            updateActivePlayerInfo(game, activePlayer, privateInformation, activePlayerInfo, extraDrawAction.action);
 }
 
 function findIndex(array: any[], predicate: (value: any, index: number, obj: any[]) => boolean): number | null {

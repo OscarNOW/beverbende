@@ -157,7 +157,7 @@ export class ActivePlayer {
     }
 }
 
-type disposeAction<performer extends ActivePlayer, drawnCard extends Card> = {
+export type disposeAction<performer extends ActivePlayer, drawnCard extends Card> = {
     performer: performer;
     type: 'dispose';
     drawnCardLocation: 'dispose';
