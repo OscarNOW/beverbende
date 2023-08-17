@@ -282,13 +282,18 @@ function compareHandCards(game: Game, a: handCards[number], b: handCards[number]
     return ranking.indexOf(a) - ranking.indexOf(b);
 }
 
-//todo: implement cache
+const averageCardCache = new WeakMap<Game, number>();
 function getAverageCard(game: Game) {
+    if (averageCardCache.has(game))
+        return averageCardCache.get(game);
+
     const cards: number[] =
         (game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[])
             .map(card => card.value);
 
-    return sum(cards) / cards.length;
+    const average = sum(cards) / cards.length;
+    averageCardCache.set(game, average);
+    return average;
 }
 
 //todo: implement cache
