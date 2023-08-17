@@ -27,3 +27,21 @@ console.log([Math.round(sum(aPoints) / aPoints.length), Math.round(sum(bPoints) 
 function sum(array: number[]): number {
     return array.reduce((a, b) => a + b, 0);
 }
+
+const plotly = require('plotly');
+plotly('OscarNOW', require('../secret.json').plotly);
+
+const data = [
+    {
+        y: aPoints,
+        boxpoints: 'all',
+        jitter: 0.3,
+        pointpos: -1.8,
+        type: 'box'
+    }
+];
+const graphOptions = { filename: 'box-plot', fileopt: 'overwrite' };
+
+plotly.plot(data, graphOptions, function (err, msg) {
+    console.log(msg);
+});
