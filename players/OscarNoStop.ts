@@ -147,12 +147,6 @@ export class OscarNoStop extends Player {
             const lowestCardIndex = findLowestCardIndex(game, activePlayerInfo.get(activePlayer).handCards);
             const lowestCard = activePlayerInfo.get(activePlayer).handCards[lowestCardIndex];
 
-            console.log()
-            console.log(drawnCard.value)
-            console.log(lowestCard)
-            console.log(compareHandCards(game, drawnCard.value, lowestCard))
-            console.log(compareHandCards(game, drawnCard.value, lowestCard) <= 0)
-
             //                         drawnCard.value <= lowestCard
             return compareHandCards(game, drawnCard.value, lowestCard) <= 0
         }
