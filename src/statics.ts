@@ -217,7 +217,7 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
                 },
                 {
                     accepted: true;
-                    action: action<performer, Card, true, stage>;
+                    action: action<performer, Card, false, stage>;
                 }
             ] | [
                 {
