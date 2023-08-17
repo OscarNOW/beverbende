@@ -135,7 +135,7 @@ export class OscarNoStop extends Player {
             if (drawnCard.action === 'extraDraw')
                 return true;
             else if (drawnCard.action === 'look')
-                return isSecondCard; //todo: might be good to also except when is first card?
+                return isSecondCard;
             else if (drawnCard.action === 'switch') {
                 const otherActivePlayers = game.activePlayers.filter(p => p !== activePlayer);
                 if (otherActivePlayers.length === 0) throw new Error('There are no other activePlayers');
