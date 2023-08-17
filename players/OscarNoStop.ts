@@ -147,6 +147,12 @@ export class OscarNoStop extends Player {
             const lowestCardIndex = findLowestCardIndex(game, activePlayerInfo.get(activePlayer).handCards);
             const lowestCard = activePlayerInfo.get(activePlayer).handCards[lowestCardIndex];
 
+            console.log()
+            console.log(drawnCard.value)
+            console.log(lowestCard)
+            console.log(compareHandCards(game, drawnCard.value, lowestCard))
+            console.log(compareHandCards(game, drawnCard.value, lowestCard) <= 0)
+
             //                         drawnCard.value <= lowestCard
             return compareHandCards(game, drawnCard.value, lowestCard) <= 0
         }
@@ -210,7 +216,7 @@ function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, a
         activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = own;
     } else if (action.type === 'look') {
         if (action.performer === activePlayer)
-            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = privateInformation[action.privateInformationId];
+            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = privateInformation[action.privateInformationId].value;
 
         else if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] === 'unknown')
             activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'known';
