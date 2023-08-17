@@ -185,6 +185,13 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
 
             activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = other;
             activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = own;
+        } else if (action.type === 'look') {
+            if (action.performer === activePlayer)
+                activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = privateInformation[action.privateInformationId];
+
+            else if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] === 'unknown')
+                activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'known';
+        } else if (action.type === 'extraDraw') {
             //todo-imp
         }
     }
