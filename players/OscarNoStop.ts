@@ -145,7 +145,6 @@ export class OscarNoStop extends Player {
             //todo-imp: return if card is lower than any card that we have
             return true; //todo-imp: remove and implement above
         }
-        return true;
     }
 
 }
