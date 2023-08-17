@@ -172,6 +172,19 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
 
             if (disposedCardValue <= averageCardValue)
                 activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.cardSlot)] = 'good';
+        } else if (action.type === 'switch') {
+            if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] === 'known')
+                activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = 'bad';
+
+            if (activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] === 'known')
+                activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = 'good';
+
+            //swap the handCard information because of the switch
+            const own = activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)];
+            const other = activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)];
+
+            activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = other;
+            activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = own;
             //todo-imp
         }
     }
