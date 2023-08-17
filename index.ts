@@ -21,9 +21,8 @@ for (let jj = 1; jj <= 10; jj++) {
     }
 }
 
-console.log([Math.min(...aPoints), Math.min(...bPoints)]);
+console.log()
 console.log([Math.round(sum(aPoints) / aPoints.length), Math.round(sum(bPoints) / bPoints.length)]);
-console.log([Math.max(...aPoints), Math.max(...bPoints)]);
 
 function sum(array: number[]): number {
     return array.reduce((a, b) => a + b, 0);
