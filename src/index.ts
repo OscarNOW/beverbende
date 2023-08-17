@@ -138,6 +138,8 @@ function createAction<canDisposeValueCard extends boolean>(game: Game, addDispos
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
         = game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, game.previousActions, game.state === 'lastRound', game.disposePile, game);
 
+    //todo: verify that newAction is correct
+
     if (newAction.performer !== game.currentActivePlayer)
         throw new Error('Performer of returned action isn\'t self');
 
