@@ -21,6 +21,9 @@ export class Game {
         this.handSize = handSize;
         this.cards = cards;
 
+        if (this.handSize < 2)
+            throw new Error('handSize must be at least 2');
+
         this.activePlayerPoints = null;
         this.lastRoundCaller = null;
         this.handCards = {};
