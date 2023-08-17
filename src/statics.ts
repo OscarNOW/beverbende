@@ -224,7 +224,7 @@ type actionCardAction<performer extends ActivePlayer, drawnCard extends ActionCa
                     accepted: false;
                     action: disposeAction<performer, Card>;
                 },
-                {
+                { //todo: no longer needed whe you can dispose ActionCards
                     accepted: false;
                     action: disposeAction<performer, Card>;
                 }
