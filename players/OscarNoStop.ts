@@ -126,7 +126,9 @@ export class OscarNoStop extends Player {
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         game: Game
     ) {
+        const activePlayerInfo = getActivePlayerInfo(game, activePlayer, privateInformation);
         const averageCard = getAverageCard(game);
+
         const isSecondCard = currentAction.actions.length === 1 && currentAction.actions[0].accepted === false;
 
         if (drawnCard.isActionCard === true) {
@@ -142,8 +144,11 @@ export class OscarNoStop extends Player {
             if ((!isSecondCard) && drawnCard.value > averageCard)
                 return false;
 
-            //todo-imp: return if card is lower than any card that we have
-            return true; //todo-imp: remove and implement above
+            const lowestCardIndex = findLowestCardIndex(game, activePlayerInfo.get(activePlayer).handCards);
+            const lowestCard = activePlayerInfo.get(activePlayer).handCards[lowestCardIndex];
+
+            //                         drawnCard.value <= lowestCard
+            return compareHandCards(game, drawnCard.value, lowestCard) <= 0
         }
     }
 
