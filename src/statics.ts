@@ -50,9 +50,7 @@ export class Player {
         canDisposeValueCard: canDisposeValueCard,
         activePlayer: activePlayer,
         previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[], //todo: remove
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
         throw new Error('Extend this class and implement your own method');
@@ -132,11 +130,9 @@ export class ActivePlayer {
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
         previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
-        disposePile: Card[],
         game: Game
     ): action<this, drawnCard, canDisposeValueCard, 'new'> {
-        return this.player.performAction(drawnCard, canDisposeValueCard, this, previousActions, isLastRound, this.privateInformation, disposePile, game);
+        return this.player.performAction(drawnCard, canDisposeValueCard, this, previousActions, this.privateInformation, game);
     };
 
     declareLastRound(

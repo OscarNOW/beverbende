@@ -15,9 +15,7 @@ export class OscarNoStop extends Player {
         canDisposeValueCard: canDisposeValueCard,
         activePlayer: activePlayer,
         previousActions: action<ActivePlayer, Card, true, 'finished'>[],
-        isLastRound: boolean,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        disposePile: Card[],
         game: Game
     ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
         const activePlayerInfo = getActivePlayerInfo(game, activePlayer, previousActions, privateInformation);

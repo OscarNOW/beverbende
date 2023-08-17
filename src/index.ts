@@ -136,7 +136,7 @@ export class Game {
 
 function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card, canDisposeValueCard: canDisposeValueCard): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
-        = game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, game.previousActions, game.state === 'lastRound', game.disposePile, game);
+        = game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, game.previousActions, game);
 
     //todo: verify that newAction is correct
 
