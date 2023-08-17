@@ -160,7 +160,9 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
         handCards: handCards;
     }> = new WeakMap();
 
-    setEmptyActivePlayerInfoValue(activePlayerInfo, activePlayer, game);
+    for (const activePlayer of game.activePlayers)
+        if (!activePlayerInfo.has(activePlayer))
+            activePlayerInfo.set(activePlayer, { handCards: ['known', ...Array(game.handSize - 2).fill('unknown'), 'known'] });
 
     activePlayerInfo.get(activePlayer).handCards[0] =
         privateInformation[activePlayer.firstCardAtStart].isActionCard === true ? 'action' :
@@ -179,8 +181,6 @@ function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, acti
 function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, privateInformation: privateInformation<activePlayer['privateInformationKeys']>, activePlayerInfo: WeakMap<ActivePlayer, { handCards: handCards }>, action: action<ActivePlayer, Card, true, 'finished'> | disposeAction<ActivePlayer, Card>) {
     const averageCardValue = getAverageCard(game);
 
-    setEmptyActivePlayerInfoValue(activePlayerInfo, action.performer, game);
-
     if (action.type === 'dispose') {
         if (action.drawnCard.isActionCard === false)
             if (action.drawnCard.value <= averageCardValue)
@@ -198,7 +198,6 @@ function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, a
         if (activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] === 'known')
             activePlayerInfo.get(action.performer).handCards[action.performer.hand.indexOf(action.ownCardSlot)] = 'bad';
 
-        setEmptyActivePlayerInfoValue(activePlayerInfo, action.otherCardSlot.activePlayer, game);
         if (activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] === 'known')
             activePlayerInfo.get(action.otherCardSlot.activePlayer).handCards[action.otherCardSlot.activePlayer.hand.indexOf(action.otherCardSlot)] = 'good';
 
@@ -217,11 +216,6 @@ function updateActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, a
     } else if (action.type === 'extraDraw')
         for (const extraDrawAction of action.actions)
             updateActivePlayerInfo(game, activePlayer, privateInformation, activePlayerInfo, extraDrawAction.action);
-}
-
-function setEmptyActivePlayerInfoValue(activePlayerInfo: WeakMap<ActivePlayer, { handCards: handCards }>, activePlayer: ActivePlayer, game: Game) {
-    if (!activePlayerInfo.has(activePlayer))
-        activePlayerInfo.set(activePlayer, { handCards: ['known', ...Array(game.handSize - 2).fill('unknown'), 'known'] });
 }
 
 function findIndex(array: any[], predicate: (value: any, index: number, obj: any[]) => boolean): number | null {
