@@ -306,27 +306,27 @@ function compareHandCards(game: Game, a: handCards[number], b: handCards[number]
     return ranking.indexOf(a) - ranking.indexOf(b);
 }
 
-const averageCardCache = new WeakMap<Game, number>();
+const averageCardCache = new WeakMap<Array<Card>, number>();
 function getAverageCard(game: Game) {
-    if (averageCardCache.has(game))
-        return averageCardCache.get(game);
+    if (averageCardCache.has(game.cards))
+        return averageCardCache.get(game.cards);
 
     const cards: number[] =
         (game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[])
             .map(card => card.value);
 
     const average = sum(cards) / cards.length;
-    averageCardCache.set(game, average);
+    averageCardCache.set(game.cards, average);
     return average;
 }
 
-const highestCardCache = new WeakMap<Game, number>();
+const highestCardCache = new WeakMap<Array<Card>, number>();
 function getHighestCard(game: Game) {
-    if (highestCardCache.has(game))
-        return highestCardCache.get(game);
+    if (highestCardCache.has(game.cards))
+        return highestCardCache.get(game.cards);
 
     const max = Math.max(...(game.cards.filter(card => card.isActionCard === false) as ValueCard<number>[]).map(card => card.value));
-    highestCardCache.set(game, max);
+    highestCardCache.set(game.cards, max);
     return max;
 }
 
