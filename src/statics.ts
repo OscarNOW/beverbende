@@ -139,7 +139,7 @@ export class ActivePlayer {
 
     acceptExtraDrawCard<drawnCard extends Card>(
         drawnCard: drawnCard,
-        currentAction: action<ActivePlayer, ActionCard<'extraDraw'>, true, 'current'>,
+        currentAction: action<this, ActionCard<'extraDraw'>, true, 'current'>,
         game: Game
     ): boolean {
         return this.player.acceptExtraDrawCard(drawnCard, this, currentAction, this.privateInformation, game);
