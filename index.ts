@@ -9,7 +9,7 @@ const bPoints = [];
 for (let jj = 1; jj <= 10; jj++) {
     console.log(`${jj}/10`);
 
-    for (let ii = 0; ii < 500; ii++) {
+    for (let ii = 0; ii < 3000; ii++) {
         // const game = new Game([new FirstPossibility(), new OscarNoStop()]);
         const game = new Game([new OscarNoStop(), new OscarNoStop()]);
 
@@ -36,14 +36,14 @@ const data = [
     {
         y: aPoints,
         boxpoints: 'all',
-        jitter: 0.2,
+        jitter: 0.4,
         pointpos: 0,
         type: 'box'
     },
     {
         y: bPoints,
         boxpoints: 'all',
-        jitter: 0.2,
+        jitter: 0.4,
         pointpos: 0,
         type: 'box'
     }
