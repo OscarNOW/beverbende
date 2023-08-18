@@ -45,6 +45,9 @@ export class Player {
         this.name = name;
     }
 
+    //todo-imp: implement something like newAction or renderAction
+    //todo-imp: implement function that gets called when the game state changes
+
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
