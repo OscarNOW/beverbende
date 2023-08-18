@@ -178,26 +178,50 @@ export class OscarNoStop extends Player {
 
 }
 
-//todo: implement cache?
+const activePlayerInfoCache: WeakMap<Game, WeakMap<ActivePlayer, {
+    lastAction: action<ActivePlayer, Card, true, 'finished'>,
+    activePlayerInfo: WeakMap<ActivePlayer, { handCards: handCards; }>
+}>> = new WeakMap();
+
 function getActivePlayerInfo<activePlayer extends ActivePlayer>(game: Game, activePlayer: activePlayer, privateInformation: privateInformation<activePlayer['privateInformationKeys']>): WeakMap<ActivePlayer, { handCards: handCards }> {
-    const activePlayerInfo: WeakMap<ActivePlayer, {
+    if (game.previousActions.length > 0 && activePlayerInfoCache.get(game)?.get?.(activePlayer)?.lastAction === game.previousActions[game.previousActions.length - 1])
+        return activePlayerInfoCache.get(game).get(activePlayer).activePlayerInfo;
+
+    let activePlayerInfo: WeakMap<ActivePlayer, {
         handCards: handCards;
-    }> = new WeakMap();
+    }>;
 
-    for (const activePlayer of game.activePlayers)
-        if (!activePlayerInfo.has(activePlayer))
-            activePlayerInfo.set(activePlayer, { handCards: ['known', ...Array(game.handSize - 2).fill('unknown'), 'known'] });
+    if (activePlayerInfoCache.get(game)?.get?.(activePlayer)?.activePlayerInfo !== undefined)
+        activePlayerInfo = activePlayerInfoCache.get(game).get(activePlayer).activePlayerInfo;
+    else {
 
-    activePlayerInfo.get(activePlayer).handCards[0] =
-        privateInformation[activePlayer.firstCardAtStart].isActionCard === true ? 'action' :
-            (privateInformation[activePlayer.firstCardAtStart] as ValueCard<number>).value;
+        activePlayerInfo = new WeakMap();
+        for (const activePlayer of game.activePlayers)
+            if (!activePlayerInfo.has(activePlayer))
+                activePlayerInfo.set(activePlayer, { handCards: ['known', ...Array(game.handSize - 2).fill('unknown'), 'known'] });
 
-    activePlayerInfo.get(activePlayer).handCards[activePlayerInfo.get(activePlayer).handCards.length - 1] =
-        privateInformation[activePlayer.lastCardAtStart].isActionCard === true ? 'action' :
-            (privateInformation[activePlayer.lastCardAtStart] as ValueCard<number>).value;
+        activePlayerInfo.get(activePlayer).handCards[0] =
+            privateInformation[activePlayer.firstCardAtStart].isActionCard === true ? 'action' :
+                (privateInformation[activePlayer.firstCardAtStart] as ValueCard<number>).value;
 
-    for (const action of game.previousActions)
+        activePlayerInfo.get(activePlayer).handCards[activePlayerInfo.get(activePlayer).handCards.length - 1] =
+            privateInformation[activePlayer.lastCardAtStart].isActionCard === true ? 'action' :
+                (privateInformation[activePlayer.lastCardAtStart] as ValueCard<number>).value;
+
+    };
+
+    // ['a', 'b', 'c']
+    const lastActionIndex = activePlayerInfoCache.get(game)?.get?.(activePlayer)?.lastAction ?
+        game.previousActions.indexOf(activePlayerInfoCache.get(game).get(activePlayer).lastAction) : -1;
+
+    for (const action of game.previousActions.filter((_, i) => i > lastActionIndex))
         updateActivePlayerInfo(game, activePlayer, privateInformation, activePlayerInfo, action);
+
+    if (!activePlayerInfoCache.has(game)) activePlayerInfoCache.set(game, new WeakMap());
+    if (!activePlayerInfoCache.get(game).has(activePlayer)) activePlayerInfoCache.get(game).set(activePlayer, { lastAction: null, activePlayerInfo: null });
+
+    activePlayerInfoCache.get(game).get(activePlayer).lastAction = game.previousActions[game.previousActions.length - 1];
+    activePlayerInfoCache.get(game).get(activePlayer).activePlayerInfo = activePlayerInfo;
 
     return activePlayerInfo;
 }
