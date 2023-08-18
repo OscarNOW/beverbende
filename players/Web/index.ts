@@ -1,13 +1,17 @@
 import { Player } from '../../src/statics';
+import { addPlayer, performAction, declareLastRound, acceptExtraDrawCard } from './site';
 
-class Web extends Player {
+export class Web extends Player {
+    id: string;
+
     constructor() {
         super('Web');
-    }
 
-    async init() {
-        //todo-imp
-    }
+        this.id = `${Math.floor(Math.random() * 10000)}`;
+        addPlayer(this);
 
-    //todo-imp: other functions
+        this.performAction = (...args) => performAction(this, ...args);
+        this.declareLastRound = (...args) => declareLastRound(this, ...args);
+        this.acceptExtraDrawCard = (...args) => acceptExtraDrawCard(this, ...args);
+    }
 }
