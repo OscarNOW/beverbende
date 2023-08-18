@@ -34,6 +34,13 @@ const plotly = require('plotly')('OscarNOW', require('../secret.json').plotly);
 
 const data = [
     {
+        y: aPoints,
+        boxpoints: 'all',
+        jitter: 0.2,
+        pointpos: 0,
+        type: 'box'
+    },
+    {
         y: bPoints,
         boxpoints: 'all',
         jitter: 0.2,
