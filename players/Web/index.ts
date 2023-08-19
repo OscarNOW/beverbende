@@ -1,3 +1,5 @@
+console.log('Web Player loaded')
+
 import { Player } from '../../src/statics';
 import { addPlayer, performAction, declareLastRound, acceptExtraDrawCard } from './site';
 
