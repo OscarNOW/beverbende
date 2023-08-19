@@ -13,5 +13,10 @@
         "ES6",
         "esnext",
         "esnext.array"
+    ],
+    "include": [
+        "src/",
+        "index.ts",
+        "players/"
     ]
 }
