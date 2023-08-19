@@ -5,6 +5,10 @@ export interface ServerToClientEvents {
     initSuccess(): void;
     initFail(reason: 'invalidId' | 'other'): void;
 
+    requestCancel(requestId: string): void;
+    requestSuccess(requestId: string): void;
+    requestFail(requestId: string, reason: 'invalidRequestId' | 'alreadyFinished' | 'other'): void;
+
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
         requestId: string,
         drawnCard: drawnCard, //todo: test if this can be sent using ws

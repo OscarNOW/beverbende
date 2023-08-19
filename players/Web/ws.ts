@@ -3,7 +3,19 @@ import { Socket, Server as WsServer } from 'socket.io';
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from './wsProtocol';
 import { Web as WebPlayer } from './index';
 
-const webPlayers: { webPlayer: WebPlayer, sockets: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>[] }[] = [];
+const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
+type requestType = typeof requestTypes[number];
+
+const webPlayers: {
+    webPlayer: WebPlayer,
+    sockets: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>[],
+    requests: {
+        type: requestType,
+        requestId: string,
+        finished: boolean,
+        args: unknown[]
+    }[]
+}[] = [];
 
 export function init(server: http.Server): void {
     const ws = new WsServer<
@@ -26,6 +38,17 @@ export function init(server: http.Server): void {
                 console.log(`Socket with WebPlayer id "${id}" disconnected`);
             });
 
+            for (const requestType of requestTypes)
+                socket.on(requestType, (requestId: string, ...args: unknown[]) => {
+                    if (!webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId))
+                        return socket.emit('requestFail', requestId, 'invalidRequestId');
+
+                    else if (webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId).finished)
+                        return socket.emit('requestFail', requestId, 'alreadyFinished');
+
+                    else return; // there is a different handler that will handle this
+                });
+
             socket.emit('initSuccess');
             console.log(`Socket initialized with WebPlayer id "${id}"`);
         });
@@ -33,41 +56,89 @@ export function init(server: http.Server): void {
 }
 
 export function addPlayer(webPlayer: WebPlayer): void {
-    webPlayers.push({ webPlayer, sockets: [] });
+    webPlayers.push({ webPlayer, sockets: [], requests: [] });
 }
 
 export function removePlayer(removeWebPlayer: WebPlayer): void {
     webPlayers.splice(webPlayers.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
 }
 
-function sendRequest(webPlayer: WebPlayer, type: 'performAction' | 'declareLastRound' | 'acceptExtraDrawCard', ...args: unknown[]) {
-    if (!webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id))
-        throw new Error(`webPlayer with id "${webPlayer.id}" not found`)
+function sendRequest(webPlayer: WebPlayer, type: requestType, ...args: unknown[]): string {
+    if (!webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
+        throw new Error(`webPlayer with id "${webPlayer.id}" not found`);
+
+    const { requests } = webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id);
+    const requestId = `${Math.floor(Math.random() * 10000)}`;
+
+    requests.push({
+        type,
+        requestId,
+        args,
+        finished: false
+    });
 
     for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
         socket.emit(type,
             // @ts-ignore
+            requestId,
             ...args
         );
+
+    return requestId;
 }
 
-export function performAction(
-    webPlayer: WebPlayer,
-    ...args: unknown[]
-): void {
-    sendRequest(webPlayer, 'performAction', ...args);
+function performRequest(webPlayer: WebPlayer, requestType: requestType, ...args: unknown[]): Promise<any> { //todo: type
+    return new Promise(res => {
+
+        if (!webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
+            throw new Error(`webPlayer with id "${webPlayer.id}" not found`);
+
+        const requestId = sendRequest(webPlayer, 'performAction', ...args);
+        const { sockets } = webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id);
+        const listeners: ((givenRequestId: string, value: unknown) => void)[] = [];
+
+        for (const socket of sockets) {
+            const listener = (givenRequestId: string, value: unknown) => {
+                if (requestId !== givenRequestId) return;
+
+                if (webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished)
+                    throw new Error('Request already finished, but listener was not removed');
+                webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished = true;
+
+                for (const loopSocket of sockets) {
+                    for (const loopListener of listeners)
+                        loopSocket.removeListener(requestType, loopListener);
+
+                    if (loopSocket === socket) loopSocket.emit('requestSuccess', requestId);
+                    else loopSocket.emit('requestCancel', requestId);
+                }
+
+                res(value);
+            };
+            listeners.push(listener);
+            socket.addListener(requestType, listener);
+        }
+
+    });
 }
 
-export function declareLastRound(
+export async function performAction(
     webPlayer: WebPlayer,
     ...args: unknown[]
-): void {
-    sendRequest(webPlayer, 'declareLastRound', ...args);
+): Promise<any> { //todo: type
+    return await performRequest(webPlayer, 'performAction', ...args);
 }
 
-export function acceptExtraDrawCard(
+export async function declareLastRound(
     webPlayer: WebPlayer,
     ...args: unknown[]
-): void {
-    sendRequest(webPlayer, 'acceptExtraDrawCard', ...args);
+): Promise<any> { //todo: type
+    return await performRequest(webPlayer, 'declareLastRound', ...args);
+}
+
+export async function acceptExtraDrawCard(
+    webPlayer: WebPlayer,
+    ...args: unknown[]
+): Promise<any> { //todo: type
+    return await performRequest(webPlayer, 'acceptExtraDrawCard', ...args);
 }
