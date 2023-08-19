@@ -61,7 +61,7 @@ export class Game {
         }
     }
 
-    nextAction(): void {
+    async nextAction(): Promise<void> {
         if (this.state === 'finished') throw new Error('Game already finished');
 
         if (this.deck.length === 0) this.addDisposePileToDeck();
@@ -75,13 +75,14 @@ export class Game {
         if (this.lastRoundCaller !== null && this.currentActivePlayer === this.lastRoundCaller)
             return this.finish();
 
-        let action = createAction(this, this.addDisposePileToDeck.bind(this), this.handCards, this.replaceHandCard.bind(this), drawnCard, true);
+        let action = await createAction(this, this.addDisposePileToDeck.bind(this), this.handCards, this.replaceHandCard.bind(this), drawnCard, true);
 
         this.previousActions.push(action);
 
         if (this.state !== 'lastRound') {
-            const declaresLastRound = this.currentActivePlayer.declareLastRound(this);
-            if (declaresLastRound) this.lastRound(this.currentActivePlayer);
+            //todo: check that all other players have had at least 1 turn
+            const declaresLastRound = await this.currentActivePlayer.declareLastRound(this);
+            if (declaresLastRound === true) this.lastRound(this.currentActivePlayer);
         }
     }
 
@@ -141,9 +142,9 @@ export class Game {
     }
 }
 
-function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card, canDisposeValueCard: canDisposeValueCard): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
+async function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card, canDisposeValueCard: canDisposeValueCard): Promise<action<ActivePlayer, Card, canDisposeValueCard, 'finished'>> {
     const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
-        = game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, game);
+        = await game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, game);
 
     //todo: verify that newAction is correct
 
@@ -151,7 +152,7 @@ function createAction<canDisposeValueCard extends boolean>(game: Game, addDispos
         throw new Error('Performer of returned action isn\'t self');
 
     let currentAction: action<ActivePlayer, Card, canDisposeValueCard, 'current'> = newActionToCurrent(game, handCards, replaceHandCard, newAction, drawnCard);
-    let finishedAction: action<ActivePlayer, Card, canDisposeValueCard, 'finished'> = currentActionToFinished(game, addDisposePileToDeck, handCards, replaceHandCard, currentAction);
+    let finishedAction: action<ActivePlayer, Card, canDisposeValueCard, 'finished'> = await currentActionToFinished(game, addDisposePileToDeck, handCards, replaceHandCard, currentAction);
 
     return finishedAction;
 }
@@ -177,7 +178,7 @@ function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, han
     return newAction;
 }
 
-function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): action<ActivePlayer, Card, canDisposeValueCard, 'finished'> {
+async function currentActionToFinished<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], currentAction: action<activePlayer, Card, canDisposeValueCard, 'current'>): Promise<action<ActivePlayer, Card, canDisposeValueCard, 'finished'>> {
     if (currentAction.drawnCardLocation === 'dispose')
         game.disposePile.push(currentAction.drawnCard);
     else if (currentAction.type === 'use')
@@ -189,7 +190,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
         if (game.deck.length === 0) addDisposePileToDeck();
         const firstExtraCard = game.deck.pop();
 
-        const firstExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
+        const firstExtraCardAccepted = await game.currentActivePlayer.acceptExtraDrawCard(
             firstExtraCard,
             {
                 ...currentAction,
@@ -198,8 +199,8 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
             game
         );
 
-        if (firstExtraCardAccepted) {
-            const action = createAction(game, addDisposePileToDeck, handCards, replaceHandCard, firstExtraCard, false);
+        if (firstExtraCardAccepted === true) {
+            const action = await createAction(game, addDisposePileToDeck, handCards, replaceHandCard, firstExtraCard, false);
 
             return {
                 ...currentAction,
@@ -221,7 +222,7 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
             if (game.deck.length === 0) addDisposePileToDeck();
             const secondExtraCard = game.deck.pop();
 
-            const secondExtraCardAccepted = game.currentActivePlayer.acceptExtraDrawCard(
+            const secondExtraCardAccepted = await game.currentActivePlayer.acceptExtraDrawCard(
                 firstExtraCard,
                 {
                     ...currentAction,
@@ -236,8 +237,8 @@ function currentActionToFinished<canDisposeValueCard extends boolean, activePlay
                 game
             );
 
-            if (secondExtraCardAccepted) {
-                const action = createAction(game, addDisposePileToDeck, handCards, replaceHandCard, secondExtraCard, false);
+            if (secondExtraCardAccepted === true) {
+                const action = await createAction(game, addDisposePileToDeck, handCards, replaceHandCard, secondExtraCard, false);
 
                 return {
                     ...currentAction,

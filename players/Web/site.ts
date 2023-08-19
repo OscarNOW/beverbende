@@ -32,8 +32,8 @@ export async function performAction<canDisposeValueCard extends boolean, activeP
     activePlayer: activePlayer,
     privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
     game: Game
-): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
-    //todo-imp
+): Promise<action<activePlayer, drawnCard, canDisposeValueCard, 'new'>> {
+    throw new Error('Not implemented');
 }
 
 export async function declareLastRound<activePlayer extends ActivePlayer>(
@@ -41,8 +41,8 @@ export async function declareLastRound<activePlayer extends ActivePlayer>(
     activePlayer: activePlayer,
     privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
     game: Game
-): boolean {
-    //todo-imp
+): Promise<boolean> {
+    throw new Error('Not implemented');
 }
 
 export async function acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
@@ -52,6 +52,6 @@ export async function acceptExtraDrawCard<activePlayer extends ActivePlayer, dra
     currentAction: action<activePlayer, ActionCard<'extraDraw'>, true, 'current'>,
     privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
     game: Game
-): boolean {
-    //todo-imp
+): Promise<boolean> {
+    throw new Error('Not implemented');
 }

@@ -54,7 +54,7 @@ export class Player {
         activePlayer: activePlayer,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         game: Game
-    ): action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
+    ): Promise<action<activePlayer, drawnCard, canDisposeValueCard, 'new'>> | action<activePlayer, drawnCard, canDisposeValueCard, 'new'> {
         throw new Error('Extend this class and implement your own method');
     };
 
@@ -62,7 +62,7 @@ export class Player {
         activePlayer: activePlayer,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         game: Game
-    ): boolean {
+    ): Promise<boolean> | boolean {
         throw new Error('Extend this class and implement your own method');
     };
 
@@ -72,7 +72,7 @@ export class Player {
         currentAction: action<activePlayer, ActionCard<'extraDraw'>, true, 'current'>,
         privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
         game: Game
-    ): boolean {
+    ): Promise<boolean> | boolean {
         throw new Error('Extend this class and implement your own method');
     };
 }
@@ -123,26 +123,26 @@ export class ActivePlayer {
         this.hand.push(cardSlot);
     }
 
-    performAction<canDisposeValueCard extends boolean, drawnCard extends Card>(
+    async performAction<canDisposeValueCard extends boolean, drawnCard extends Card>(
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
         game: Game
-    ): action<this, drawnCard, canDisposeValueCard, 'new'> {
-        return this.player.performAction(drawnCard, canDisposeValueCard, this, this.privateInformation, game);
+    ): Promise<action<this, drawnCard, canDisposeValueCard, 'new'>> {
+        return await this.player.performAction(drawnCard, canDisposeValueCard, this, this.privateInformation, game);
     };
 
-    declareLastRound(
+    async declareLastRound(
         game: Game
-    ): boolean {
-        return this.player.declareLastRound(this, this.privateInformation, game);
+    ): Promise<boolean> {
+        return await this.player.declareLastRound(this, this.privateInformation, game);
     }
 
-    acceptExtraDrawCard<drawnCard extends Card>(
+    async acceptExtraDrawCard<drawnCard extends Card>(
         drawnCard: drawnCard,
         currentAction: action<this, ActionCard<'extraDraw'>, true, 'current'>,
         game: Game
-    ): boolean {
-        return this.player.acceptExtraDrawCard(drawnCard, this, currentAction, this.privateInformation, game);
+    ): Promise<boolean> {
+        return await this.player.acceptExtraDrawCard(drawnCard, this, currentAction, this.privateInformation, game);
     }
 }
 
