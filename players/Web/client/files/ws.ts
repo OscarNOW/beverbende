@@ -6,7 +6,7 @@ const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'
 
 function waitForMessages<messages extends (keyof ServerToClientEvents)[]>(
     messages: messages,
-    check?: ((message: messages[number], ...args: unknown[]) => boolean) //todo-imp: implement check
+    check?: ((message: messages[number], ...args: unknown[]) => boolean)
 ): Promise<[messages[number], ...any[]]> { //todo: type further (replace any with correct type)
     return new Promise(res => {
 
@@ -16,6 +16,7 @@ function waitForMessages<messages extends (keyof ServerToClientEvents)[]>(
         for (const message of messages) {
             const listener = (...args: unknown[]) => {
                 if (finished === true) throw new Error('Finished is true, but listener is not removed');
+                if (check !== undefined && !check(message, ...args)) return; //todo: test if this works
                 finished = true;
 
                 for (const loopMessage of messages)
