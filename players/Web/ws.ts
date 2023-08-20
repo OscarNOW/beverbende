@@ -40,11 +40,13 @@ export function init(server: http.Server): void {
 
             socket.emit('initSuccess');
 
-            for (const request of webPlayer.requests)
-                emitRequest(socket, request.type,
-                    request.requestId,
-                    request.args
-                );
+            setTimeout(() => {
+                for (const request of webPlayer.requests)
+                    emitRequest(socket, request.type,
+                        request.requestId,
+                        request.args
+                    );
+            }, 500);
         });
     });
 }
