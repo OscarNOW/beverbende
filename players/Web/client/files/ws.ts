@@ -3,8 +3,6 @@ import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, r
 import { acceptExtraDrawCard, declareLastRound, performAction, cancel } from './player'; // this import path gets magically replaced by a batch file at build time
 import { parse } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
 
-const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
-
 function waitForMessages<messages extends (keyof ServerToClientEvents)[]>(
     messages: messages,
     check?: ((message: messages[number], ...args: unknown[]) => boolean)
@@ -71,7 +69,7 @@ const pendingRequests: request[] = [];
         request.cancel();
     });
 
-    const listener = (type: requestType) => async (requestId: string, rawArgs: string) => { //todo: type
+    const listener = async (requestId: string, type: requestType, rawArgs: string) => { //todo: type
         const args = parse(rawArgs); //todo: type
 
         pendingRequests.push({
@@ -86,8 +84,7 @@ const pendingRequests: request[] = [];
         await handlePendingRequests();
     };
 
-    for (const requestType of requestTypes)
-        socket.on(requestType, listener(requestType));
+    socket.on('request', listener);
 
     console.debug('Waiting for requests...');
 })();
@@ -125,7 +122,7 @@ async function handlePendingRequests() {
         if (request.canceled)
             continue;
 
-        socket.emit(request.type, request.requestId, value);
+        socket.emit('request', request.requestId, request.type, value);
         //todo: remove eslint-disable and change eslint rule
         // eslint-disable-next-line no-unused-vars
         const [message, _, reason] = await waitForMessages(['requestSuccess', 'requestFail'], (message, messageRequestId, reason) => messageRequestId === request.requestId);

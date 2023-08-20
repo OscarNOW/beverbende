@@ -11,45 +11,16 @@ export interface ServerToClientEvents {
     initSuccess(): void;
     initFail(reason: 'invalidId' | 'other'): void;
 
+    request(requestId: string, type: requestType, args: string): void;
+
     requestCancel(requestId: string): void;
     requestSuccess(requestId: string): void;
     requestFail(requestId: string, reason: 'invalidRequestId' | 'requestCanceled' | 'other'): void;
-
-    //todo: merge these decision functions into 1 request function
-    performAction(
-        requestId: string,
-        args: string
-    ): void;
-
-    declareLastRound(
-        requestId: string,
-        args: string
-    ): void;
-
-    acceptExtraDrawCard(
-        requestId: string,
-        args: string
-    ): void;
 }
 
 export interface ClientToServerEvents {
     init(id: string): void;
-
-    //todo: merge these decision functions into 1 request function
-    performAction(
-        requestId: string,
-        value: string
-    ): void;
-
-    declareLastRound(
-        requestId: string,
-        value: boolean
-    ): void;
-
-    acceptExtraDrawCard(
-        requestId: string,
-        value: boolean
-    ): void;
+    request(requestId: string, type: requestType, args: string): void;
 }
 
 export interface InterServerEvents { }

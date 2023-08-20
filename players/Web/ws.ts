@@ -1,6 +1,6 @@
 import http from 'http';
 import { Socket, Server as WsServer } from 'socket.io';
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, request, requestType, requestTypes } from './wsProtocol';
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, request, requestType } from './wsProtocol';
 import { Web as WebPlayer } from './index';
 import { stringifyStrict as stringify } from 'circular-json-es6';
 
@@ -28,21 +28,20 @@ export function init(server: http.Server): void {
                 webPlayer.sockets.splice(webPlayer.sockets.indexOf(socket), 1);
             });
 
-            for (const requestType of requestTypes)
-                socket.on(requestType, (requestId: string, ...args: unknown[]) => {
-                    if (!webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId))
-                        return socket.emit('requestFail', requestId, 'invalidRequestId');
+            socket.on('request', (requestId: string) => {
+                if (!webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId))
+                    return socket.emit('requestFail', requestId, 'invalidRequestId');
 
-                    else if (webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId).finished)
-                        return socket.emit('requestFail', requestId, 'requestCanceled');
+                else if (webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId).finished)
+                    return socket.emit('requestFail', requestId, 'requestCanceled');
 
-                    else return; // there is a different handler that will handle this
-                });
+                else return; // there is a different handler that will handle this
+            });
 
             socket.emit('initSuccess');
 
             for (const request of webPlayer.requests)
-                emit(socket, request.type,
+                emitRequest(socket, request.type,
                     [request.requestId],
                     request.args
                 );
@@ -58,8 +57,9 @@ export function removePlayer(removeWebPlayer: WebPlayer): void {
     webPlayers.splice(webPlayers.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
 }
 
-function emit(socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, message: keyof ServerToClientEvents, rawArgs: unknown[], stringifyArgs: unknown[]) {
-    socket.emit(message,
+function emitRequest(socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, type: requestType, rawArgs: unknown[], stringifyArgs: unknown[]) {
+    socket.emit('request',
+        type,
         // @ts-ignore //todo: remove
         ...rawArgs,
         stringify(stringifyArgs)
@@ -81,7 +81,7 @@ function sendRequest(webPlayer: WebPlayer, type: requestType, ...args: unknown[]
     });
 
     for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
-        emit(socket, type,
+        emitRequest(socket, type,
             [requestId],
             args
         );
