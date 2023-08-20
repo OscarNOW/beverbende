@@ -59,6 +59,9 @@ export class Game {
 
             this.activePlayers.push(activePlayer);
         }
+
+        for (const activePlayer of this.activePlayers)
+            activePlayer.init();
     }
 
     async nextAction(): Promise<void> {

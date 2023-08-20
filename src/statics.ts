@@ -48,6 +48,10 @@ export class Player {
     //todo: implement something like newAction or renderAction
     //todo: implement function that gets called when the game state changes
 
+    init(activePlayer: ActivePlayer): Promise<void> {
+        throw new Error('Extend this class and implement your own method');
+    }
+
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
@@ -121,6 +125,10 @@ export class ActivePlayer {
 
     addCardSlot(cardSlot: CardSlot<this>): void { //todo: make private?
         this.hand.push(cardSlot);
+    }
+
+    async init() {
+        return await this.player.init(this);
     }
 
     async performAction<canDisposeValueCard extends boolean, drawnCard extends Card>(
