@@ -43,6 +43,8 @@ export function init(server: http.Server): void {
 
             socket.emit('initSuccess');
             console.log(`Socket initialized with WebPlayer id "${id}"`);
+
+            //todo-imp: send pending requests to new socket
         });
     });
 }
