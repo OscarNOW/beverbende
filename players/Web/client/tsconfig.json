@@ -4,7 +4,8 @@
         "module": "es2015",
         "moduleResolution": "node",
         "sourceMap": true,
-        "outDir": "../../../dist/"
+        "outDir": "../../../dist",
+        "rootDir": "../../../"
     },
     "lib": [
         "es2017",
