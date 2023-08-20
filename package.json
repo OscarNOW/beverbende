@@ -8,8 +8,11 @@
   },
   "scripts": {
     "do": "npm run build && npm run start",
-    "build": "npx tsc --incremental",
-    "start": "node --enable-source-maps dist/."
+    "build": "npm run ts && npm run copyOther",
+    "ts": "npx tsc --build --incremental",
+    "copyOther": "npx copyfiles -u 1 players/**/*.html dist/players/",
+    "start": "node --enable-source-maps dist/.",
+    "clean": "rimraf dist/"
   },
   "author": "Oscar",
   "license": "ISC",
@@ -18,7 +21,9 @@
     "@types/node": "^20.4.10",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.47.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.1.6"
   },
   "dependencies": {
