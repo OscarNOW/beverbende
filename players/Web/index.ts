@@ -5,7 +5,7 @@ import { addPlayer, performAction, declareLastRound, acceptExtraDrawCard } from 
 
 export class Web extends Player {
     id: string;
-    url: null | string;
+    url: null | string; //todo: this should be in ActivePlayer or maybe a map or something, because this won't work when this Player is instantiated multiple times
     initClassCallbacks: (() => void)[];
 
     constructor() {

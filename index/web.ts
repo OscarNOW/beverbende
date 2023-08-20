@@ -6,8 +6,7 @@ import { Web } from '../players/Web';
 
 ; (async () => {
     const web = new Web();
-    await web.initClass();
-    console.log(web.url);
+    web.initClass().then(() => console.log(web.url));
 
     const game = new Game([new FirstPossibility(), new OscarNoStop(), web]);
     while (game.state !== 'finished')
