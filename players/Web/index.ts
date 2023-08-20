@@ -5,12 +5,13 @@ import { addPlayer, performAction, declareLastRound, acceptExtraDrawCard } from 
 
 export class Web extends Player {
     id: string;
+    url: string;
 
     constructor() {
         super('Web');
 
         this.id = `${Math.floor(Math.random() * 10000)}`;
-        addPlayer(this);
+        this.url = addPlayer(this);
 
         this.performAction = (...args) => performAction(this, ...args);
         this.declareLastRound = (...args) => declareLastRound(this, ...args);

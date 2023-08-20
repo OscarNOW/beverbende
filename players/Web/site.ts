@@ -26,7 +26,12 @@ server.listen(port, () => {
     console.log('Web player listening on port 4000')
 });
 
-export const addPlayer = (webPlayer: WebPlayer) => { activeWebPlayerIds.push(webPlayer.id); wsAddPlayer(webPlayer); };
+export const addPlayer = (webPlayer: WebPlayer): string => {
+    activeWebPlayerIds.push(webPlayer.id);
+    wsAddPlayer(webPlayer);
+
+    return `http://localhost:${port}/player/${webPlayer.id}`;
+};
 export const removePlayer = wsRemovePlayer;
 
 export const performAction = wsPerformAction;
