@@ -1,1 +1,1 @@
-import './user/web';
+import './index/web';
