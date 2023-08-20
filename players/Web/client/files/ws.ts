@@ -51,9 +51,12 @@ const pendingRequests: request[] = [];
 
     const id = window.location.pathname.split('/')[2];
     socket.emit('init', id);
+    console.debug('Initializing...')
 
     const [event, reason] = await waitForMessages(['initSuccess', 'initFail']);
     if (event === 'initFail') return handleFatalError(event, reason as Parameters<ServerToClientEvents['initFail']>[0]);
+
+    console.debug('Initialize successful');
 
     const listener = (type: requestType) => async (requestId: string, ...args: unknown[]) => { //todo: type
         pendingRequests.push({
@@ -71,6 +74,7 @@ const pendingRequests: request[] = [];
     for (const requestType of requestTypes)
         socket.on(requestType, listener(requestType));
 
+    console.debug('Waiting for requests...');
 })();
 
 async function handlePendingRequests() {
