@@ -8,13 +8,13 @@ if not exist node_modules/socket.io-client/dist (
 )
 cd node_modules/socket.io-client/dist
 
-copy "socket.io.esm.min.js" "../../../dist/players/web/client/files/socket.io-client-copy.js"
+copy "socket.io.esm.min.js" "../../../dist/players/web/client/files/socket.io-copy-client.js"
 
 cd ../../..
 
 
 cd dist/players/web/client/files/
-powershell -Command "(gc ws.js) -replace 'socket.io-client', '/files/socket.io-client-copy.js' | Out-File -encoding ASCII ws.js"
+powershell -Command "(gc ws.js) -replace 'socket.io-client', '/files/socket.io-copy-client.js' | Out-File -encoding ASCII ws.js"
 cd ../../../../..
 
 :end
