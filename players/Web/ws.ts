@@ -3,11 +3,13 @@ import { Socket, Server as WsServer } from 'socket.io';
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, request, requestType } from './wsProtocol';
 import { Web as WebPlayer } from './index';
 import { stringifyStrict as stringify } from 'circular-json-es6';
+import { ActivePlayer } from '../../src/statics';
 
 const webPlayers: {
-    webPlayer: WebPlayer,
-    sockets: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>[],
-    requests: request[]
+    webPlayer: WebPlayer;
+    activePlayer: ActivePlayer;
+    sockets: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>[];
+    requests: request[];
 }[] = [];
 
 export function init(server: http.Server): void {
@@ -38,7 +40,7 @@ export function init(server: http.Server): void {
                 else return; // there is a different handler that will handle this
             });
 
-            socket.emit('initSuccess');
+            socket.emit('initSuccess', stringify(webPlayer.activePlayer));
 
             setTimeout(() => {
                 for (const request of webPlayer.requests)
@@ -52,8 +54,8 @@ export function init(server: http.Server): void {
     });
 }
 
-export function addPlayer(webPlayer: WebPlayer): void {
-    webPlayers.push({ webPlayer, sockets: [], requests: [] });
+export function addPlayer(webPlayer: WebPlayer, activePlayer: ActivePlayer): void {
+    webPlayers.push({ webPlayer, activePlayer, sockets: [], requests: [] });
 }
 
 export function removePlayer(removeWebPlayer: WebPlayer): void {

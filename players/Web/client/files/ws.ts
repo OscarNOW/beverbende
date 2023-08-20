@@ -1,7 +1,8 @@
 import { io, Socket } from 'socket.io-client'; // this import path gets magically replaced by a batch file at build time
 import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
-import { acceptExtraDrawCard, declareLastRound, performAction, cancel } from './player'; // this import path gets magically replaced by a batch file at build time
+import { acceptExtraDrawCard, declareLastRound, performAction, cancel, init } from './player'; // this import path gets magically replaced by a batch file at build time
 import { parse } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
+import { ActivePlayer } from '../../../../src/statics';
 
 function waitForMessages<messages extends (keyof ServerToClientEvents)[]>(
     messages: messages,
@@ -55,8 +56,9 @@ const pendingRequests: request[] = [];
     socket.emit('init', id);
     console.debug('Initializing...')
 
-    const [event, reason] = await waitForMessages(['initSuccess', 'initFail']);
-    if (event === 'initFail') return handleFatalError(event, reason as Parameters<ServerToClientEvents['initFail']>[0]);
+    const [event, arg] = await waitForMessages(['initSuccess', 'initFail']);
+    if (event === 'initFail') return handleFatalError(event, arg as Parameters<ServerToClientEvents['initFail']>[0]);
+    else if (event === 'initSuccess') init(arg as ActivePlayer);
 
     console.debug('Initialize successful');
 

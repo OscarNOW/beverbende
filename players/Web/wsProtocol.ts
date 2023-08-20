@@ -8,7 +8,7 @@ export type request = {
 };
 
 export interface ServerToClientEvents {
-    initSuccess(): void;
+    initSuccess(activePlayer: string): void;
     initFail(reason: 'invalidId' | 'other'): void;
 
     request(requestId: string, type: requestType, args: string): void;

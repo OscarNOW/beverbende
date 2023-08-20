@@ -5,6 +5,7 @@ import express from 'express';
 import http from 'http';
 import { Web as WebPlayer } from './index';
 import path from 'path';
+import { ActivePlayer } from '../../src/statics';
 
 const app = express();
 app.use('/files', express.static(path.join(__dirname, './client/files/')));
@@ -27,9 +28,9 @@ server.listen(port, () => {
     console.log('Web player listening on port 4000')
 });
 
-export const addPlayer = (webPlayer: WebPlayer): string => {
+export const addPlayer = (webPlayer: WebPlayer, activePlayer: ActivePlayer): string => {
     activeWebPlayerIds.push(webPlayer.id);
-    wsAddPlayer(webPlayer);
+    wsAddPlayer(webPlayer, activePlayer);
 
     return `http://localhost:${port}/player/${webPlayer.id}`;
 };

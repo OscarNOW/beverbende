@@ -54,3 +54,7 @@ export function acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard
 export async function cancel(): Promise<void> {
     console.log('cancel');
 }
+
+export async function init(activePlayer: ActivePlayer): Promise<void> {
+    console.log('init', activePlayer);
+}
