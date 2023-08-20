@@ -1,6 +1,6 @@
-import { io, Socket } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client'; // this import path gets magically replaced by a batch file at build time
 import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
-import { acceptExtraDrawCard, declareLastRound, performAction } from './player';
+import { acceptExtraDrawCard, declareLastRound, performAction } from './player'; // this import path gets magically replaced by a batch file at build time
 
 const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
 
