@@ -50,3 +50,7 @@ export function acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard
         });
     });
 };
+
+export async function cancel(): Promise<void> {
+    console.log('cancel');
+}

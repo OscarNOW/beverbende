@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'; // this import path gets magically replaced by a batch file at build time
 import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
-import { acceptExtraDrawCard, declareLastRound, performAction } from './player'; // this import path gets magically replaced by a batch file at build time
+import { acceptExtraDrawCard, declareLastRound, performAction, cancel } from './player'; // this import path gets magically replaced by a batch file at build time
 import { parse } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
 
 const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
@@ -62,6 +62,15 @@ const pendingRequests: request[] = [];
 
     console.debug('Initialize successful');
 
+    socket.on('requestCancel', (requestId: string) => {
+        const request = pendingRequests.find(({ requestId: a }) => a === requestId);
+        if (!request) throw new Error(`requestCancel gave id "${requestId}", but no pendingRequest with that id found`);
+
+        if (request.canceled) throw new Error(`requestCancel gave id "${requestId}", but request was already canceled`);
+
+        request.cancel();
+    });
+
     const listener = (type: requestType) => async (requestId: string, rawArgs: string) => { //todo: type
         const args = parse(rawArgs); //todo: type
 
@@ -90,7 +99,8 @@ async function handlePendingRequests() {
         let value: any; //todo: type
         try {
             value = await new Promise(async (res, rej) => {
-                request.cancel = () => {
+                request.cancel = async () => {
+                    await cancel();
                     request.canceled = true;
                     pendingRequests.splice(pendingRequests.indexOf(request), 1);
                     rej(new Error('Cancelled'));
@@ -98,7 +108,8 @@ async function handlePendingRequests() {
                 request.started = true;
 
                 const v = await callRequest(request.type, ...request.args);
-                request.cancel = () => {
+                request.cancel = async () => {
+                    await cancel();
                     request.canceled = true;
                     pendingRequests.splice(pendingRequests.indexOf(request), 1);
                 };
@@ -131,9 +142,9 @@ async function handlePendingRequests() {
     }
 }
 
-function callRequest(requestType: requestType, ...args: any[]): Promise<any> {
+async function callRequest(requestType: requestType, ...args: any[]): Promise<any> {
     // @ts-ignore //todo: don't ignore errors
-    return ({
+    return await ({
         performAction,
         acceptExtraDrawCard,
         declareLastRound
