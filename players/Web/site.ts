@@ -4,9 +4,10 @@ import { init as wsInit, addPlayer as wsAddPlayer, removePlayer as wsRemovePlaye
 import express from 'express';
 import http from 'http';
 import { Web as WebPlayer } from './index';
+import path from 'path';
 
 const app = express();
-app.use('/files', express.static('./client/files'));
+app.use('/files', express.static(path.join(__dirname, './client/files/')));
 const server = http.createServer(app);
 wsInit(server);
 
