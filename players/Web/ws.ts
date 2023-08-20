@@ -1,20 +1,12 @@
 import http from 'http';
 import { Socket, Server as WsServer } from 'socket.io';
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from './wsProtocol';
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, request, requestType, requestTypes } from './wsProtocol';
 import { Web as WebPlayer } from './index';
-
-const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
-type requestType = typeof requestTypes[number];
 
 const webPlayers: {
     webPlayer: WebPlayer,
     sockets: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>[],
-    requests: {
-        type: requestType,
-        requestId: string,
-        finished: boolean,
-        args: unknown[]
-    }[]
+    requests: request[]
 }[] = [];
 
 export function init(server: http.Server): void {
@@ -44,7 +36,7 @@ export function init(server: http.Server): void {
                         return socket.emit('requestFail', requestId, 'invalidRequestId');
 
                     else if (webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId).finished)
-                        return socket.emit('requestFail', requestId, 'alreadyFinished');
+                        return socket.emit('requestFail', requestId, 'requestCanceled');
 
                     else return; // there is a different handler that will handle this
                 });

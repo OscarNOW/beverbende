@@ -1,14 +1,24 @@
 import { Game } from '../../src';
 import { ActionCard, ActivePlayer, Card, action, privateInformation } from '../../src/statics';
 
+export const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
+export type requestType = typeof requestTypes[number];
+export type request = {
+    type: requestType,
+    requestId: string,
+    finished: boolean,
+    args: unknown[]
+};
+
 export interface ServerToClientEvents {
     initSuccess(): void;
     initFail(reason: 'invalidId' | 'other'): void;
 
     requestCancel(requestId: string): void;
     requestSuccess(requestId: string): void;
-    requestFail(requestId: string, reason: 'invalidRequestId' | 'alreadyFinished' | 'other'): void;
+    requestFail(requestId: string, reason: 'invalidRequestId' | 'requestCanceled' | 'other'): void;
 
+    //todo: merge these decision functions into 1 request function
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
         requestId: string,
         drawnCard: drawnCard, //todo: test if this can be sent using ws
@@ -38,6 +48,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
     init(id: string): void;
 
+    //todo: merge these decision functions into 1 request function
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
         requestId: string,
         value: action<activePlayer, drawnCard, canDisposeValueCard, 'new'>
