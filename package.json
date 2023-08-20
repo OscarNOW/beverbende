@@ -7,6 +7,7 @@
     "node": "20.x.x"
   },
   "scripts": {
+    "cleanDo": "npm run clean && npm run do",
     "do": "npm run build && npm run start",
     "cleanBuild": "npm run clean && npm run build",
     "build": "npm run ts && npm run copyOther",
