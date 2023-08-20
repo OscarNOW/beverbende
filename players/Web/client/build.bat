@@ -1,4 +1,4 @@
-@echo off
+@REM @echo off
 
 cd ../../..
 
@@ -15,8 +15,8 @@ if not exist node_modules/circular-json-es6/index.js (
     goto :end
 )
 cd node_modules/circular-json-es6
-copy "index.js" "../../dist/players/web/client/files/circular-json-copy"
-cd ../../..
+copy "index.js" "../../dist/players/web/client/files/circular-json-copy.js"
+cd ../..
 
 
 cd dist/players/web/client/files/
