@@ -6,6 +6,8 @@ export class FirstPossibility extends Player {
         super('FirstPossibility');
     }
 
+    init(activePlayer: ActivePlayer): Promise<void> { return Promise.resolve() };
+
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,

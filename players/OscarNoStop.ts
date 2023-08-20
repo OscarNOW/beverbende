@@ -10,6 +10,8 @@ export class OscarNoStop extends Player {
         super('OscarNoStop');
     }
 
+    init(activePlayer: ActivePlayer): Promise<void> { return Promise.resolve() };
+
     performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
         drawnCard: drawnCard,
         canDisposeValueCard: canDisposeValueCard,
