@@ -1,16 +1,21 @@
-@echo off
+@REM @echo off
 
 cd ../../..
 
 if not exist node_modules/socket.io-client/dist (
     echo node_modules/socket.io-client/dist not exist
-    goto :end_1
+    goto :end
 )
 cd node_modules/socket.io-client/dist
 
-copy socket.io.esm.min.js ../../../dist/players/web/client/socket.io-client.js
+copy "socket.io.esm.min.js" "../../../dist/players/web/client/files/socket.io-client.js"
 
 cd ../../..
 
-:end_1
-cd players/web/client
+
+cd dist/players/web/client/files/
+powershell -Command "(gc ws.js) -replace 'socket.io-client', '/files/socket.io-client.js' | Out-File -encoding ASCII ws.js"
+cd ../../../../..
+
+:end
+cd players/Web/client
