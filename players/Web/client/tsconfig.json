@@ -6,7 +6,7 @@
         "sourceMap": false,
         "outDir": "../../../dist",
         "rootDir": "../../../",
-        "incremental": true
+        "incremental": false
     },
     "lib": [
         "es2017",
