@@ -19,8 +19,6 @@ export function init(server: http.Server): void {
     >(server);
 
     ws.on('connection', socket => {
-        console.log('Socket connected');
-
         socket.on('init', id => {
             const webPlayer = webPlayers.find(({ webPlayer }) => webPlayer.id === id);
             if (!webPlayer) return socket.emit('initFail', 'invalidId');
@@ -28,7 +26,6 @@ export function init(server: http.Server): void {
             webPlayer.sockets.push(socket);
             socket.on('disconnect', () => {
                 webPlayer.sockets.splice(webPlayer.sockets.indexOf(socket), 1);
-                console.log(`Socket with WebPlayer id "${id}" disconnected`);
             });
 
             for (const requestType of requestTypes)
@@ -43,7 +40,6 @@ export function init(server: http.Server): void {
                 });
 
             socket.emit('initSuccess');
-            console.log(`Socket initialized with WebPlayer id "${id}"`);
 
             for (const request of webPlayer.requests)
                 emit(socket, request.type,
