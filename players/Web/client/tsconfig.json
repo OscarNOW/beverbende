@@ -5,7 +5,8 @@
         "moduleResolution": "node",
         "sourceMap": false,
         "outDir": "../../../dist",
-        "rootDir": "../../../"
+        "rootDir": "../../../",
+        "incremental": true
     },
     "lib": [
         "es2017",
