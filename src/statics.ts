@@ -1,11 +1,11 @@
 import { Game } from './index';
 
 export type actionCardActionName = 'switch' | 'look' | 'extraDraw';
-export class ActionCard<currentAction extends actionCardActionName> {
-    action: currentAction;
+export class ActionCard<currentActionName extends actionCardActionName> {
+    action: currentActionName;
     isActionCard: true;
 
-    constructor(action: currentAction) {
+    constructor(action: currentActionName) {
         this.action = action;
         this.isActionCard = true;
     }
