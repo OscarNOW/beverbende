@@ -21,6 +21,10 @@ cd ../..
 
 cd dist/players/web/client/files/
 
+powershell -Command "(gc circular-json-copy.js) -replace 'exports.stringify =', 'export' | Out-File -encoding ASCII circular-json-copy.js"
+powershell -Command "(gc circular-json-copy.js) -replace 'exports.parse =', 'export' | Out-File -encoding ASCII circular-json-copy.js"
+powershell -Command "(gc circular-json-copy.js) -replace 'exports.stringifyStrict =', 'export' | Out-File -encoding ASCII circular-json-copy.js"
+
 powershell -Command "(gc ws.js) -replace 'socket.io-client', '/files/socket.io-copy-client.js' | Out-File -encoding ASCII ws.js"
 powershell -Command "(gc ws.js) -replace 'circular-json-es6', '/files/circular-json-copy.js' | Out-File -encoding ASCII ws.js"
 
