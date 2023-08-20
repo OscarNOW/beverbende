@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client'; // this import path gets magically replaced by a batch file at build time
 import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
 import { acceptExtraDrawCard, declareLastRound, performAction } from './player'; // this import path gets magically replaced by a batch file at build time
+import { parse } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
 
 const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
 
@@ -61,7 +62,9 @@ const pendingRequests: request[] = [];
 
     console.debug('Initialize successful');
 
-    const listener = (type: requestType) => async (requestId: string, ...args: unknown[]) => { //todo: type
+    const listener = (type: requestType) => async (requestId: string, rawArgs: string) => { //todo: type
+        const args = parse(rawArgs); //todo: type
+
         pendingRequests.push({
             type,
             requestId,

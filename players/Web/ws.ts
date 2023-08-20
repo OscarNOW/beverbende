@@ -66,7 +66,7 @@ function emit(socket: Socket<ClientToServerEvents, ServerToClientEvents, InterSe
     socket.emit(message,
         // @ts-ignore //todo: remove
         ...rawArgs,
-        stringifyArgs.map(a => stringify(a))
+        stringify(stringifyArgs)
     )
 }
 

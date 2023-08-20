@@ -18,17 +18,17 @@ export interface ServerToClientEvents {
     //todo: merge these decision functions into 1 request function
     performAction(
         requestId: string,
-        args: string[]
+        args: string
     ): void;
 
     declareLastRound(
         requestId: string,
-        args: string[]
+        args: string
     ): void;
 
     acceptExtraDrawCard(
         requestId: string,
-        args: string[]
+        args: string
     ): void;
 }
 
