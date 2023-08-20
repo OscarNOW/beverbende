@@ -1,1 +1,1 @@
-import './user/speed';
+import './user/web';
