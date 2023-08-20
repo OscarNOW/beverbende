@@ -89,6 +89,7 @@ export type privateInformation<includingKeys extends string[]> = {
 export class ActivePlayer {
     player: Player;
     hand: CardSlot<this>[];
+    game: Game;
 
     firstCardAtStart: this['privateInformationKeys'][number];
     lastCardAtStart: this['privateInformationKeys'][number];
@@ -96,9 +97,10 @@ export class ActivePlayer {
     private privateInformation: privateInformation<this['privateInformationKeys']>;
     privateInformationKeys: string[];
 
-    constructor(player: Player, firstCardAtStart: Card, lastCardAtStart: Card) {
+    constructor(player: Player, game: Game, firstCardAtStart: Card, lastCardAtStart: Card) {
         this.player = player;
         this.hand = [];
+        this.game = game;
 
         this.privateInformationKeys = [];
         this.privateInformation = {} as privateInformation<this['privateInformationKeys']>;

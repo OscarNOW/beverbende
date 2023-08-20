@@ -58,7 +58,7 @@ const pendingRequests: request[] = [];
 
     const [event, arg] = await waitForMessages(['initSuccess', 'initFail']);
     if (event === 'initFail') return handleFatalError(event, arg as Parameters<ServerToClientEvents['initFail']>[0]);
-    else if (event === 'initSuccess') init(arg as ActivePlayer);
+    else if (event === 'initSuccess') init(parse(arg) as ActivePlayer);
 
     console.debug('Initialize successful');
 

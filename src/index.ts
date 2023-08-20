@@ -45,7 +45,7 @@ export class Game {
                 cards.push(card);
             }
 
-            const activePlayer = new ActivePlayer(player, cards[0], cards[cards.length - 1]);
+            const activePlayer = new ActivePlayer(player, this, cards[0], cards[cards.length - 1]);
 
             for (const i in cards) {
                 const index = parseInt(i);
