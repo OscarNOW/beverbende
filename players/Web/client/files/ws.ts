@@ -1,10 +1,12 @@
 import { io, Socket } from 'socket.io-client';
-import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType, requestTypes } from '../../wsProtocol';
+import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
 import { acceptExtraDrawCard, declareLastRound, performAction } from './player';
+
+const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
 
 function waitForMessages<messages extends (keyof ServerToClientEvents)[]>(
     messages: messages,
-    check?: ((message: messages[number], ...args: unknown[]) => boolean)
+    check?: ((message: messages[number], ...args: unknown[]) => boolean) //todo-imp: implement check
 ): Promise<[messages[number], ...any[]]> { //todo: type further (replace any with correct type)
     return new Promise(res => {
 
