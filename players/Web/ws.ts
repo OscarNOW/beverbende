@@ -42,7 +42,7 @@ export function init(server: http.Server): void {
 
             for (const request of webPlayer.requests)
                 emitRequest(socket, request.type,
-                    [request.requestId],
+                    request.requestId,
                     request.args
                 );
         });
@@ -57,11 +57,10 @@ export function removePlayer(removeWebPlayer: WebPlayer): void {
     webPlayers.splice(webPlayers.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
 }
 
-function emitRequest(socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, type: requestType, rawArgs: unknown[], stringifyArgs: unknown[]) {
+function emitRequest(socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, type: requestType, requestId: string, stringifyArgs: unknown[]) {
     socket.emit('request',
+        requestId,
         type,
-        // @ts-ignore //todo: remove
-        ...rawArgs,
         stringify(stringifyArgs)
     )
 }
@@ -81,8 +80,9 @@ function sendRequest(webPlayer: WebPlayer, type: requestType, ...args: unknown[]
     });
 
     for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
-        emitRequest(socket, type,
-            [requestId],
+        emitRequest(socket,
+            type,
+            requestId,
             args
         );
 
