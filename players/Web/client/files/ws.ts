@@ -109,6 +109,8 @@ async function handlePendingRequests() {
             continue;
 
         socket.emit(request.type, request.requestId, value);
+        //todo: remove eslint-disable and change eslint rule
+        // eslint-disable-next-line no-unused-vars
         const [message, _, reason] = await waitForMessages(['requestSuccess', 'requestFail'], (message, messageRequestId, reason) => messageRequestId === request.requestId);
         if (message === 'requestFail')
             if (reason === 'requestCanceled') {
