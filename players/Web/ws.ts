@@ -42,7 +42,8 @@ export function init(server: http.Server): void {
 
             setTimeout(() => {
                 for (const request of webPlayer.requests)
-                    emitRequest(socket, request.type,
+                    emitRequest(socket,
+                        request.type,
                         request.requestId,
                         request.args
                     );
