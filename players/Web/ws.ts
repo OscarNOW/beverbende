@@ -2,6 +2,7 @@ import http from 'http';
 import { Socket, Server as WsServer } from 'socket.io';
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, request, requestType, requestTypes } from './wsProtocol';
 import { Web as WebPlayer } from './index';
+import { stringifyStrict as stringify } from 'circular-json-es6';
 
 const webPlayers: {
     webPlayer: WebPlayer,
@@ -45,10 +46,9 @@ export function init(server: http.Server): void {
             console.log(`Socket initialized with WebPlayer id "${id}"`);
 
             for (const request of webPlayer.requests)
-                socket.emit(request.type,
-                    // @ts-ignore
-                    request.requestId,
-                    ...request.args
+                emit(socket, request.type,
+                    [request.requestId],
+                    request.args
                 );
         });
     });
@@ -60,6 +60,14 @@ export function addPlayer(webPlayer: WebPlayer): void {
 
 export function removePlayer(removeWebPlayer: WebPlayer): void {
     webPlayers.splice(webPlayers.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
+}
+
+function emit(socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, message: keyof ServerToClientEvents, rawArgs: unknown[], stringifyArgs: unknown[]) {
+    socket.emit(message,
+        // @ts-ignore //todo: remove
+        ...rawArgs,
+        ...(stringifyArgs.map(a => stringify(a)))
+    )
 }
 
 function sendRequest(webPlayer: WebPlayer, type: requestType, ...args: unknown[]): string {
@@ -77,10 +85,9 @@ function sendRequest(webPlayer: WebPlayer, type: requestType, ...args: unknown[]
     });
 
     for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
-        socket.emit(type,
-            // @ts-ignore
-            requestId,
-            ...args
+        emit(socket, type,
+            [requestId],
+            args
         );
 
     return requestId;

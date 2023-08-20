@@ -1,6 +1,3 @@
-import { Game } from '../../src';
-import { ActionCard, ActivePlayer, Card, action, privateInformation } from '../../src/statics';
-
 export const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
 export type requestType = typeof requestTypes[number];
 export type request = {
@@ -19,29 +16,29 @@ export interface ServerToClientEvents {
     requestFail(requestId: string, reason: 'invalidRequestId' | 'requestCanceled' | 'other'): void;
 
     //todo: merge these decision functions into 1 request function
-    performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
+    performAction(
         requestId: string,
-        drawnCard: drawnCard, //todo: test if this can be sent using ws
-        canDisposeValueCard: canDisposeValueCard,
-        activePlayer: activePlayer, //todo: test if this can be sent using ws
-        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        game: Game //todo: test if this can be sent using ws
+        drawnCard: string,
+        canDisposeValueCard: string,
+        activePlayer: string,
+        privateInformation: string,
+        game: string
     ): void;
 
-    declareLastRound<activePlayer extends ActivePlayer>(
+    declareLastRound(
         requestId: string,
-        activePlayer: activePlayer, //todo: test if this can be sent using ws
-        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        game: Game //todo: test if this can be sent using ws
+        activePlayer: string,
+        privateInformation: string,
+        game: string
     ): void;
 
-    acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
+    acceptExtraDrawCard(
         requestId: string,
-        drawnCard: drawnCard, //todo: test if this can be sent using ws
-        activePlayer: activePlayer, //todo: test if this can be sent using ws
-        currentAction: action<activePlayer, ActionCard<'extraDraw'>, true, 'current'>, //todo: test if this can be sent using ws
-        privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-        game: Game //todo: test if this can be sent using ws
+        drawnCard: string,
+        activePlayer: string,
+        currentAction: string,
+        privateInformation: string,
+        game: string
     ): void;
 }
 
@@ -49,9 +46,9 @@ export interface ClientToServerEvents {
     init(id: string): void;
 
     //todo: merge these decision functions into 1 request function
-    performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
+    performAction(
         requestId: string,
-        value: action<activePlayer, drawnCard, canDisposeValueCard, 'new'>
+        value: string
     ): void;
 
     declareLastRound(
