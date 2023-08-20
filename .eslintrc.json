@@ -34,7 +34,6 @@
         "no-unneeded-ternary": "warn",
         "no-return-assign": "warn",
         "operator-assignment": "warn",
-        "require-await": "warn",
         "no-var": "warn",
         "no-unused-vars": [
             "warn",
