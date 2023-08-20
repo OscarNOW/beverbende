@@ -31,8 +31,9 @@ powershell -Command "(gc ws.js) -replace 'circular-json-es6', '/files/circular-j
 if exist player.js (
     if exist copy-player.js ( del copy-player.js )
     rename "player.js" "copy-player.js"
-    powershell -Command "(gc ws.js) -replace './player', '/files/copy-player.js' | Out-File -encoding ASCII ws.js"
 )
+
+powershell -Command "(gc ws.js) -replace './player', '/files/copy-player.js' | Out-File -encoding ASCII ws.js"
 
 cd ../../../../..
 
