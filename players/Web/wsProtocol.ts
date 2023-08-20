@@ -1,5 +1,5 @@
 import { Game } from '../../src';
-import { ActionCard, ActivePlayer, Card, action, privateInformation } from '../../src/statics';
+import { ActionCard, ActivePlayer, Card, CardSlot, action, privateInformation } from '../../src/statics';
 
 export const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
 export type requestType = typeof requestTypes[number];
@@ -9,6 +9,14 @@ export type request = {
     finished: boolean,
     args: unknown[]
 };
+
+export type WsCardSlot = Omit<CardSlot<ActivePlayer>, 'activePlayer'>;
+export type WsActivePlayer = Omit<Omit<ActivePlayer, 'privateInformation'>, 'hand'> & {
+    hand: WsCardSlot[];
+}
+export type WsGame = Omit<Game, 'activePlayers'> & {
+    activePlayers: WsActivePlayer[];
+}
 
 export interface ServerToClientEvents {
     initSuccess(): void;
