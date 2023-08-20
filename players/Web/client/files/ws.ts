@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType, requestTypes } from '../../wsProtocol';
-import { acceptExtraDrawCard, declareLastRound, performAction } from './player'; //todo-imp: maybe need to add an extension here
+import { acceptExtraDrawCard, declareLastRound, performAction } from './player';
 
 function waitForMessages<messages extends (keyof ServerToClientEvents)[]>(
     messages: messages,

@@ -14,7 +14,10 @@ cd ../../..
 
 
 cd dist/players/web/client/files/
+
 powershell -Command "(gc ws.js) -replace 'socket.io-client', '/files/socket.io-copy-client.js' | Out-File -encoding ASCII ws.js"
+powershell -Command "(gc ws.js) -replace './player', '/files/player.js' | Out-File -encoding ASCII ws.js"
+
 cd ../../../../..
 
 :end
