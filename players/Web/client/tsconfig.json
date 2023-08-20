@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "es2015",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "../../../dist/"
+    },
+    "lib": [
+        "es2017",
+        "es2019",
+        "ES6",
+        "esnext",
+        "esnext.array"
+    ],
+    "include": [
+        "files/"
+    ]
+}

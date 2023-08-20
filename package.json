@@ -9,7 +9,7 @@
   "scripts": {
     "do": "npm run build && npm run start",
     "build": "npm run ts && npm run copyOther",
-    "ts": "npx tsc --build --incremental",
+    "ts": "npx tsc --build --incremental tsconfig.json && npx tsc --build --incremental players/Web/client/tsconfig.json",
     "copyOther": "npx copyfiles -u 1 players/**/*.html dist/players/",
     "start": "node --enable-source-maps dist/.",
     "clean": "rimraf dist/"

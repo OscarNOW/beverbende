@@ -5,7 +5,7 @@
         "target": "es6",
         "moduleResolution": "node",
         "sourceMap": true,
-        "outDir": "dist",
+        "outDir": "dist/",
         "lib": [
             "ES6",
             "DOM"
@@ -23,5 +23,8 @@
         "index.ts",
         "players/",
         "index/"
+    ],
+    "exclude": [
+        "players/Web/client/"
     ]
 }
