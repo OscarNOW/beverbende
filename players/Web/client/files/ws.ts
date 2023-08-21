@@ -31,12 +31,13 @@ function waitForMessages<messages extends (keyof ServerToClientEvents | 'connect
     });
 };
 
-function handleError(type: string, reason: string): void {
+function handleError(type: string, reason: string | Error): void {
     console.error(new Error(`${type} ${reason}`));
     alert(`${type} ${reason}`);
 }
 
-function handleFatalError(type: 'initFail', reason: Parameters<ServerToClientEvents['initFail']>[0]): void {
+function handleFatalError(type: 'initFail' | 'connectFail' | 'disconnect', reason?: Parameters<ServerToClientEvents['initFail']>[0] | Error): void { //todo: type better
+    state(type);
     handleError(type, reason);
     socket.disconnect();
 }
@@ -52,14 +53,25 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 const pendingRequests: request[] = [];
 
 ; (async () => {
+    socket.on('disconnect', () => {
+        handleFatalError('disconnect');
+    });
+
+    {
+        const [message, error] = await waitForMessages(['connect', 'connect_error']);
+        if (message === 'connect_error') return handleFatalError('connectFail', error);
+        else if (message === 'connect') state('initializing');
+    }
+
     const id = window.location.pathname.split('/')[2];
     socket.emit('init', id);
     console.debug('Initializing...')
-    state('initializing');
 
-    const [message, arg] = await waitForMessages(['initSuccess', 'initFail']);
-    if (message === 'initFail') return handleFatalError(message, arg as Parameters<ServerToClientEvents['initFail']>[0]);
-    else if (message === 'initSuccess') init(parse(arg) as ActivePlayer);
+    {
+        const [message, arg] = await waitForMessages(['initSuccess', 'initFail']);
+        if (message === 'initFail') return handleFatalError(message, arg as Parameters<ServerToClientEvents['initFail']>[0]);
+        else if (message === 'initSuccess') init(parse(arg) as ActivePlayer);
+    }
 
     console.debug('Initialize successful');
     state('addingListeners');
