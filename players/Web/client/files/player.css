@@ -72,5 +72,5 @@
 
 .not-selectable {
     cursor: not-allowed;
-    filter: brightness(0.5);
+    filter: brightness(0.4) blur(2px);
 }
