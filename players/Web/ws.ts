@@ -18,7 +18,7 @@ export function init(server: http.Server): void {
         ServerToClientEvents,
         InterServerEvents,
         SocketData
-    >(server);
+    >(server, { pingInterval: 3000, pingTimeout: 7000 });
 
     ws.on('connection', socket => {
         socket.on('init', id => {
