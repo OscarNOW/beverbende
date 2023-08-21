@@ -60,5 +60,10 @@ export function init(activePlayer: ActivePlayer): void {
 }
 
 export function state(newState: 'connecting' | 'initializing' | 'addingListeners' | 'ready'): void {
-    console.log('state', newState);
+    document.getElementById('state').innerText = {
+        'connecting': 'Connecting...',
+        'initializing': 'Initializing...',
+        'addingListeners': 'Adding listeners...',
+        'ready': ''
+    }[newState];
 }

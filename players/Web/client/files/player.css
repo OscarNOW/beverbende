@@ -1,0 +1,25 @@
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+#deck {
+    margin: 3vmax;
+    width: 15vmax;
+    height: 23vmax;
+
+    background-image: url(/files/img/cards/back/125.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.label {
+    margin: auto;
+    width: 50%;
+
+    position: relative;
+    top: -1.3vmax;
+
+    font-size: 1.1vmax;
+    font-weight: bold;
+}
