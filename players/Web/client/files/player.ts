@@ -1,6 +1,14 @@
 import { Game } from '../../../../src';
 import { ActionCard, ActivePlayer, Card, action, privateInformation } from '../../../../src/statics';
 
+function render( //todo: export this function and make the Game call it when a new action is performed
+    game: Game,
+    privateInformation: privateInformation<ActivePlayer['privateInformationKeys']>,
+    activePlayer: ActivePlayer
+): void {
+    renderCardFront(document.getElementById('disposePile'), game.disposePile.at(-1));
+}
+
 export function performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
     drawnCard: drawnCard,
     canDisposeValueCard: canDisposeValueCard,
@@ -8,6 +16,8 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
     privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
     game: Game
 ): Promise<action<activePlayer, drawnCard, canDisposeValueCard, 'new'>> {
+    render(game, privateInformation, activePlayer);
+
     return new Promise(res => {
         console.log('performAction', {
             drawnCard,
@@ -24,6 +34,8 @@ export function declareLastRound<activePlayer extends ActivePlayer>(
     privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
     game: Game
 ): Promise<boolean> {
+    render(game, privateInformation, activePlayer);
+
     return new Promise(res => {
         console.log('declareLastRound', {
             activePlayer,
@@ -40,6 +52,8 @@ export function acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard
     privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
     game: Game
 ): Promise<boolean> {
+    render(game, privateInformation, activePlayer);
+
     return new Promise(res => {
         console.log('acceptExtraDrawCard', {
             drawnCard,
@@ -84,4 +98,11 @@ export function state(newState: keyof typeof messages): void {
         setTimeout(() => { //so all pending requests can be sent
             stateElement.style.display = 'none';
         }, 700);
+}
+
+function renderCardFront(element: HTMLElement, card: Card): void {
+    if (card.isActionCard === true)
+        element.innerText = `ActionCard: ${card.action}`;
+    else
+        element.innerText = `ValueCard: ${card.value}`;
 }
