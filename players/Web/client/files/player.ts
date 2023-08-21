@@ -6,7 +6,7 @@ function render( //todo: export this function and make the Game call it when a n
     privateInformation: privateInformation<ActivePlayer['privateInformationKeys']>,
     activePlayer: ActivePlayer
 ): void {
-    renderCardFront(document.getElementById('disposePile'), game.disposePile.at(-1));
+    renderCardFront(document.getElementById('disposePileCard'), game.disposePile.at(-1));
 }
 
 export function performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(

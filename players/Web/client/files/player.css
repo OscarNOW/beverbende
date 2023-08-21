@@ -26,10 +26,15 @@ p {
     margin: 3vmax;
     width: var(--cardWidth);
     height: var(--cardHeight);
+}
 
+#disposePileCard {
     border-radius: 10px;
     border: 2px solid black;
     padding: 0.5vmax;
+
+    width: 100%;
+    height: 100%;
 }
 
 .hand {
@@ -108,4 +113,9 @@ p {
 #state>p {
     font-weight: 500;
     font-size: 5vmax;
+}
+
+.gameCenter {
+    display: flex;
+    gap: 3vw;
 }
