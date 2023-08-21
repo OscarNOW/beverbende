@@ -33,22 +33,24 @@
     background-size: contain;
 }
 
-/* todo-imp: nth-child not working */
-
-.hand:nth-child(4n).card {
-    rotate: -10deg;
+.hand>.card:nth-child(4n) {
+    rotate: -3deg;
+    transform: translateY(-10px);
 }
 
-.hand:nth-child(4n + 1).card {
-    rotate: 182deg;
+.hand>.card:nth-child(4n + 1) {
+    rotate: 174deg;
+    transform: translateY(6px);
 }
 
-.hand:nth-child(4n + 2).card {
+.hand>.card:nth-child(4n + 2) {
     rotate: -1deg;
+    transform: translateY(-5px);
 }
 
-.hand:nth-child(4n + 3).card {
-    rotate: 188deg;
+.hand>.card:nth-child(4n + 3) {
+    rotate: 183deg;
+    transform: translateY(20px);
 }
 
 .label {
