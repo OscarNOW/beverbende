@@ -103,7 +103,7 @@ async function handlePendingRequests() {
         try {
             value = await new Promise(async (res, rej) => {
                 request.cancel = async () => {
-                    await cancel();
+                    cancel();
                     request.canceled = true;
                     pendingRequests.splice(pendingRequests.indexOf(request), 1);
                     rej(new Error('Cancelled'));
@@ -112,7 +112,7 @@ async function handlePendingRequests() {
 
                 const v = await callRequest(request.type, ...request.args);
                 request.cancel = async () => {
-                    await cancel();
+                    cancel();
                     request.canceled = true;
                     pendingRequests.splice(pendingRequests.indexOf(request), 1);
                 };

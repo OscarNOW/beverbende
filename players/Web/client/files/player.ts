@@ -51,11 +51,11 @@ export function acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard
     });
 };
 
-export async function cancel(): Promise<void> {
+export function cancel(): void {
     console.log('cancel');
 }
 
-export async function init(activePlayer: ActivePlayer): Promise<void> {
+export function init(activePlayer: ActivePlayer): void {
     console.log('init', activePlayer);
 }
 
