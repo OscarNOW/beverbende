@@ -4,7 +4,7 @@ import { acceptExtraDrawCard, declareLastRound, performAction, cancel, init, sta
 import { parse } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
 import { ActivePlayer } from '../../../../src/statics';
 
-function waitForMessages<messages extends (keyof ServerToClientEvents)[]>(
+function waitForMessages<messages extends (keyof ServerToClientEvents | 'connect' | 'connect_error')[]>(
     messages: messages,
     check?: ((message: messages[number], ...args: unknown[]) => boolean)
 ): Promise<[messages[number], ...any[]]> { //todo: type further (replace any with correct type)
@@ -52,15 +52,14 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 const pendingRequests: request[] = [];
 
 ; (async () => {
-
     const id = window.location.pathname.split('/')[2];
     socket.emit('init', id);
     console.debug('Initializing...')
     state('initializing');
 
-    const [event, arg] = await waitForMessages(['initSuccess', 'initFail']);
-    if (event === 'initFail') return handleFatalError(event, arg as Parameters<ServerToClientEvents['initFail']>[0]);
-    else if (event === 'initSuccess') init(parse(arg) as ActivePlayer);
+    const [message, arg] = await waitForMessages(['initSuccess', 'initFail']);
+    if (message === 'initFail') return handleFatalError(message, arg as Parameters<ServerToClientEvents['initFail']>[0]);
+    else if (message === 'initSuccess') init(parse(arg) as ActivePlayer);
 
     console.debug('Initialize successful');
     state('addingListeners');
