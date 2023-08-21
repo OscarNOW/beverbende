@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'; // this import path gets magically replaced by a batch file at build time
 import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
-import { acceptExtraDrawCard, declareLastRound, performAction, cancel, init } from './player'; // this import path gets magically replaced by a batch file at build time
+import { acceptExtraDrawCard, declareLastRound, performAction, cancel, init, state } from './player'; // this import path gets magically replaced by a batch file at build time
 import { parse } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
 import { ActivePlayer } from '../../../../src/statics';
 
@@ -47,6 +47,7 @@ type request = Omit<serverRequest, 'finished'> & {
     cancel: null | (() => void);
 };
 
+state('connecting');
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 const pendingRequests: request[] = [];
 
@@ -55,12 +56,14 @@ const pendingRequests: request[] = [];
     const id = window.location.pathname.split('/')[2];
     socket.emit('init', id);
     console.debug('Initializing...')
+    state('initializing');
 
     const [event, arg] = await waitForMessages(['initSuccess', 'initFail']);
     if (event === 'initFail') return handleFatalError(event, arg as Parameters<ServerToClientEvents['initFail']>[0]);
     else if (event === 'initSuccess') init(parse(arg) as ActivePlayer);
 
     console.debug('Initialize successful');
+    state('addingListeners');
 
     socket.on('requestCancel', (requestId: string) => {
         const request = pendingRequests.find(({ requestId: a }) => a === requestId);
@@ -89,6 +92,7 @@ const pendingRequests: request[] = [];
     socket.on('request', listener);
 
     console.debug('Waiting for requests...');
+    state('ready');
 })();
 
 async function handlePendingRequests() {

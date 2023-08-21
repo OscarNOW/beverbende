@@ -58,3 +58,7 @@ export async function cancel(): Promise<void> {
 export async function init(activePlayer: ActivePlayer): Promise<void> {
     console.log('init', activePlayer);
 }
+
+export function state(newState: 'connecting' | 'initializing' | 'addingListeners' | 'ready'): void {
+    console.log('state', newState);
+}
