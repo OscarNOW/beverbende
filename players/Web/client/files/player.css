@@ -2,6 +2,10 @@
     font-family: 'Roboto', sans-serif;
 }
 
+p {
+    margin: 0;
+}
+
 :root {
     --cardWidth: 15vmax;
     --cardHeight: 23vmax;
@@ -73,4 +77,25 @@
 .not-selectable {
     cursor: not-allowed;
     filter: brightness(0.4) blur(2px);
+}
+
+#state {
+    position: fixed;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+
+    background-color: white;
+    cursor: wait;
+}
+
+#state>p {
+    font-weight: 500;
+    font-size: 10vmax;
 }

@@ -59,11 +59,20 @@ export function init(activePlayer: ActivePlayer): void {
     console.log('init', activePlayer);
 }
 
-export function state(newState: 'connecting' | 'initializing' | 'addingListeners' | 'ready'): void {
-    document.getElementById('state').innerText = {
-        'connecting': 'Connecting...',
-        'initializing': 'Initializing...',
-        'addingListeners': 'Adding listeners...',
-        'ready': ''
+let stateElement: HTMLElement | null = document.getElementById('state');
+export function state(newState: 'connecting' | 'initializing' | 'addingListeners' | 'waitingForRequests'): void {
+    if (stateElement === null) throw new Error('state function called, but stateElement already removed');
+
+    document.getElementById('stateText').innerText = {
+        'connecting': 'Connecting',
+        'initializing': 'Initializing',
+        'addingListeners': 'Adding listeners',
+        'waitingForRequests': 'Waiting for requests'
     }[newState];
+
+    if (newState === 'waitingForRequests')
+        setTimeout(() => { //so all pending requests can be sent
+            stateElement.remove();
+            stateElement = null;
+        }, 700);
 }

@@ -92,7 +92,7 @@ const pendingRequests: request[] = [];
     socket.on('request', listener);
 
     console.debug('Waiting for requests...');
-    state('ready');
+    state('waitingForRequests');
 })();
 
 async function handlePendingRequests() {
