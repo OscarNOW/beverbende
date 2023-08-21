@@ -6,29 +6,29 @@ import { addPlayer, performAction, declareLastRound, acceptExtraDrawCard } from 
 export class Web extends Player {
     id: string;
     url: null | string;
-    initClassCallbacks: (() => void)[];
+    initFinishedCallbacks: (() => void)[];
 
     constructor() {
         super('Web');
 
         this.id = `${Math.floor(Math.random() * 10000)}`;
         this.url = null;
-        this.initClassCallbacks = [];
+        this.initFinishedCallbacks = [];
 
         this.init = async (activePlayer: ActivePlayer) => {
             this.url = addPlayer(this, activePlayer);
-            for (const callback of this.initClassCallbacks) callback();
+            for (const callback of this.initFinishedCallbacks) callback();
         };
         this.performAction = (...args) => performAction(this, ...args);
         this.declareLastRound = (...args) => declareLastRound(this, ...args);
         this.acceptExtraDrawCard = (...args) => acceptExtraDrawCard(this, ...args);
     }
 
-    initClass(): Promise<void> {
-        if (this.url) return Promise.resolve();
+    gerUrl(): Promise<string> {
+        if (this.url !== null) return Promise.resolve(this.url);
         else
             return new Promise(res => {
-                this.initClassCallbacks.push(res);
+                this.initFinishedCallbacks.push(() => res(this.url));
             });
     }
 }
