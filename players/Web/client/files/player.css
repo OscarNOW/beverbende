@@ -2,15 +2,53 @@
     font-family: 'Roboto', sans-serif;
 }
 
+:root {
+    --cardWidth: 15vmax;
+    --cardHeight: 23vmax;
+}
+
 #deck {
     margin: 3vmax;
-    width: 15vmax;
-    height: 23vmax;
+    width: var(--cardWidth);
+    height: var(--cardHeight);
 
     background-image: url(/files/img/cards/back/125.png);
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+}
+
+.hand {
+    display: flex;
+    gap: 1vmax;
+}
+
+.hand>.card {
+    width: var(--cardWidth);
+    height: var(--cardHeight);
+
+    background-image: url(/files/img/cards/back/1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+/* todo-imp: nth-child not working */
+
+.hand:nth-child(4n).card {
+    rotate: -10deg;
+}
+
+.hand:nth-child(4n + 1).card {
+    rotate: 182deg;
+}
+
+.hand:nth-child(4n + 2).card {
+    rotate: -1deg;
+}
+
+.hand:nth-child(4n + 3).card {
+    rotate: 188deg;
 }
 
 .label {
