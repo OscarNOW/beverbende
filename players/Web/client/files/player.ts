@@ -60,11 +60,11 @@ export function init(activePlayer: ActivePlayer): void {
 }
 
 const messages = {
-    'disconnect': 'De verbinding is verloren. Herlaad de pagina.',
+    'disconnect': 'De verbinding is verloren',
     'connecting': 'Verbinden',
-    'connectFail': 'Het verbinden is mislukt. Herlaad de pagina.',
+    'connectFail': 'Het verbinden is mislukt',
     'initializing': 'Initialiseren',
-    'initFail': 'De initialisatie is mislukt. Herlaad de pagina.',
+    'initFail': 'De initialisatie is mislukt',
     'addingListeners': 'Functies toevoegen',
     'waitingForRequests': 'Wachten voor aanvragen'
 } as const;
@@ -74,6 +74,11 @@ export function state(newState: keyof typeof messages): void {
     stateElement.style.display = null;
 
     document.getElementById('stateText').innerText = messages[newState];
+
+    if (['disconnect', 'connectFail'].includes(newState))
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
 
     if (newState === 'waitingForRequests')
         setTimeout(() => { //so all pending requests can be sent
