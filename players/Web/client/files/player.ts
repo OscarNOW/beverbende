@@ -3,7 +3,7 @@ import { ActionCard, ActivePlayer, Card, action, privateInformation } from '../.
 
 function render( //todo: export this function and make the Game call it when a new action is performed
     game: Game,
-    privateInformation: privateInformation<ActivePlayer['privateInformationKeys']>,
+    privateInformation: null | privateInformation<ActivePlayer['privateInformationKeys']>,
     activePlayer: ActivePlayer
 ): void {
     renderCardFront(document.getElementById('disposePileCard'), game.disposePile.at(-1));
@@ -69,7 +69,8 @@ export function cancel(): void {
     console.log('cancel');
 }
 
-export function init(activePlayer: ActivePlayer): void {
+export function init(activePlayer: ActivePlayer): void { //todo: add privateInformation to init
+    render(activePlayer.game, null, activePlayer);
     console.log('init', activePlayer);
 }
 
