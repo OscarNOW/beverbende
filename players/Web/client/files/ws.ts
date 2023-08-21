@@ -32,8 +32,7 @@ function waitForMessages<messages extends (keyof ServerToClientEvents | 'connect
 };
 
 function handleError(type: string, reason: string | Error): void {
-    console.error(new Error(`${type} ${reason}`));
-    alert(`${type} ${reason}`);
+    console.error(type, reason);
 }
 
 function handleFatalError(type: 'initFail' | 'connectFail' | 'disconnect', reason?: Parameters<ServerToClientEvents['initFail']>[0] | Error): void { //todo: type better
