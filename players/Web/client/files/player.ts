@@ -59,9 +59,9 @@ export function init(activePlayer: ActivePlayer): void {
     console.log('init', activePlayer);
 }
 
-let stateElement: HTMLElement | null = document.getElementById('state');
+let stateElement: HTMLElement = document.getElementById('state');
 export function state(newState: 'connecting' | 'initializing' | 'addingListeners' | 'waitingForRequests'): void {
-    if (stateElement === null) throw new Error('state function called, but stateElement already removed');
+    stateElement.style.display = null;
 
     document.getElementById('stateText').innerText = {
         'connecting': 'Connecting',
@@ -72,7 +72,6 @@ export function state(newState: 'connecting' | 'initializing' | 'addingListeners
 
     if (newState === 'waitingForRequests')
         setTimeout(() => { //so all pending requests can be sent
-            stateElement.remove();
-            stateElement = null;
+            stateElement.style.display = 'none';
         }, 700);
 }
