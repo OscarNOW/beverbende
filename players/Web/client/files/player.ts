@@ -14,6 +14,22 @@ function renderDrawnCard(drawnCard: Card): void {
     document.getElementById('drawnCardContainer').style.display = null;
 }
 
+function makeSelectable(element: HTMLElement, callback: () => void): void {
+    const listener = () => {
+        element.removeEventListener('click', listener);
+        callback();
+    };
+
+    element.addEventListener('click', listener);
+    element.classList.remove('not-selectable');
+    element.classList.add('selectable');
+};
+
+function makeNotSelectable(element: HTMLElement): void {
+    element.classList.remove('selectable');
+    element.classList.add('not-selectable');
+}
+
 export function performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
     drawnCard: drawnCard,
     canDisposeValueCard: canDisposeValueCard,
