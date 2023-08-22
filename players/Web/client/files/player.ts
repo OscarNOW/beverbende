@@ -41,6 +41,17 @@ function makeNotSelectable(element: HTMLElement): void {
     element.classList.add('not-selectable');
 }
 
+function makeOtherHandsNotSelectable(): void {
+    for (let activePlayerIndex = 1; activePlayerIndex < game.activePlayers.length; activePlayerIndex++)
+        for (const cardElement of [...document.getElementById(`player${activePlayerIndex}hand`).children].filter(a => a instanceof HTMLElement) as HTMLElement[])
+            makeNotSelectable(cardElement);
+}
+
+function makeOurHandNotSelectable(): void {
+    for (const cardElement of [...document.getElementById('ourHand').children].filter(a => a instanceof HTMLElement) as HTMLElement[])
+        makeNotSelectable(cardElement);
+}
+
 export function performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
     drawnCard: drawnCard,
     canDisposeValueCard: canDisposeValueCard,
@@ -55,14 +66,37 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
     render();
     renderDrawnCard(drawnCard);
 
+    console.log('performAction', {
+        drawnCard,
+        canDisposeValueCard,
+        activePlayer,
+        privateInformation,
+        game
+    });
+
     return new Promise(res => {
-        console.log('performAction', {
-            drawnCard,
-            canDisposeValueCard,
-            activePlayer,
-            privateInformation,
-            game
-        });
+        if (drawnCard.isActionCard) {
+            if (drawnCard.action === 'extraDraw') {
+                makeOtherHandsNotSelectable();
+                makeOurHandNotSelectable();
+                makeNotSelectable(document.getElementById('deck'));
+
+                makeSelectable(document.getElementById('disposePileCard'), () => {
+                    res({
+                        // @ts-ignore //todo: remove this
+                        performer: givenActivePlayer,
+                        type: 'extraDraw',
+                        drawnCardLocation: 'dispose',
+                        drawnCard,
+                        actions: []
+                    });
+                });
+            } else {
+                //todo-imp
+            }
+        } else {
+            //todo-imp
+        }
     });
 };
 
