@@ -7,6 +7,17 @@ let privateInformation: privateInformation<(typeof activePlayer)['privateInforma
 
 function render(): void { //todo: export this function and make the Game call it when a new action is performed
     renderCardFront(document.getElementById('disposePileCard'), game.disposePile.at(-1));
+
+    const maxActivePlayers = 4;
+    const activePlayerAmount = game.activePlayers.length;
+
+    if (activePlayerAmount > 4) throw new Error(`Max amount of ${maxActivePlayers} activePlayers implemented for the WebPlayer`);
+
+    for (let ii = 1; ii < maxActivePlayers; ii++)
+        if (activePlayerAmount > ii)
+            document.getElementById(`player${ii}hand`).style.display = null
+        else
+            document.getElementById(`player${ii}hand`).style.display = 'none';
 }
 
 function renderDrawnCard(drawnCard: Card): void {
