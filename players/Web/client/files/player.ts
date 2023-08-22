@@ -1,22 +1,32 @@
 import { Game } from '../../../../src';
 import { ActionCard, ActivePlayer, Card, action, privateInformation } from '../../../../src/statics';
 
-function render( //todo: export this function and make the Game call it when a new action is performed
-    game: Game,
-    privateInformation: null | privateInformation<ActivePlayer['privateInformationKeys']>,
-    activePlayer: ActivePlayer
-): void {
+let game: Game;
+let activePlayer: ActivePlayer;
+let privateInformation: privateInformation<(typeof activePlayer)['privateInformationKeys']>;
+
+function render(): void { //todo: export this function and make the Game call it when a new action is performed
     renderCardFront(document.getElementById('disposePileCard'), game.disposePile.at(-1));
+}
+
+function renderDrawnCard(drawnCard: Card): void {
+    renderCardFront(document.getElementById('drawnCard'), drawnCard);
+    document.getElementById('drawnCardContainer').style.display = null;
 }
 
 export function performAction<canDisposeValueCard extends boolean, activePlayer extends ActivePlayer, drawnCard extends Card>(
     drawnCard: drawnCard,
     canDisposeValueCard: canDisposeValueCard,
-    activePlayer: activePlayer,
-    privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-    game: Game
+    givenActivePlayer: activePlayer,
+    givenPrivateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+    givenGame: Game
 ): Promise<action<activePlayer, drawnCard, canDisposeValueCard, 'new'>> {
-    render(game, privateInformation, activePlayer);
+    game = givenGame;
+    privateInformation = givenPrivateInformation;
+    activePlayer = givenActivePlayer;
+
+    render();
+    renderDrawnCard(drawnCard);
 
     return new Promise(res => {
         console.log('performAction', {
@@ -30,11 +40,15 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
 };
 
 export function declareLastRound<activePlayer extends ActivePlayer>(
-    activePlayer: activePlayer,
-    privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-    game: Game
+    givenActivePlayer: activePlayer,
+    givenPrivateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+    givenGame: Game
 ): Promise<boolean> {
-    render(game, privateInformation, activePlayer);
+    game = givenGame;
+    privateInformation = givenPrivateInformation;
+    activePlayer = givenActivePlayer;
+
+    render();
 
     return new Promise(res => {
         console.log('declareLastRound', {
@@ -47,12 +61,17 @@ export function declareLastRound<activePlayer extends ActivePlayer>(
 
 export function acceptExtraDrawCard<activePlayer extends ActivePlayer, drawnCard extends Card>(
     drawnCard: drawnCard,
-    activePlayer: activePlayer,
+    givenActivePlayer: activePlayer,
     currentAction: action<activePlayer, ActionCard<'extraDraw'>, true, 'current'>,
-    privateInformation: privateInformation<activePlayer['privateInformationKeys']>,
-    game: Game
+    givenPrivateInformation: privateInformation<activePlayer['privateInformationKeys']>,
+    givenGame: Game
 ): Promise<boolean> {
-    render(game, privateInformation, activePlayer);
+    game = givenGame;
+    privateInformation = givenPrivateInformation;
+    activePlayer = givenActivePlayer;
+
+    render();
+    renderDrawnCard(drawnCard);
 
     return new Promise(res => {
         console.log('acceptExtraDrawCard', {
@@ -69,9 +88,12 @@ export function cancel(): void {
     console.log('cancel');
 }
 
-export function init(activePlayer: ActivePlayer): void { //todo: add privateInformation to init
-    render(activePlayer.game, null, activePlayer);
-    console.log('init', activePlayer);
+export function init(givenActivePlayer: ActivePlayer): void { //todo: add privateInformation to init
+    game = givenActivePlayer.game;
+    activePlayer = givenActivePlayer;
+
+    render();
+    console.log('init', givenActivePlayer);
 }
 
 const messages = {

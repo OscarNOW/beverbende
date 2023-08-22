@@ -1,5 +1,11 @@
+body {
+    overflow: hidden;
+}
+
 * {
     font-family: 'Roboto', sans-serif;
+    --cardWidth: calc(var(--cardScale) * var(--fullCardWidth));
+    --cardHeight: calc(var(--cardScale) * var(--fullCardHeight));
 }
 
 p {
@@ -7,12 +13,12 @@ p {
 }
 
 :root {
-    --cardWidth: 15vmax;
-    --cardHeight: 23vmax;
+    --cardScale: 0.8;
+    --fullCardWidth: 10.8vmax;
+    --fullCardHeight: 16.56vmax;
 }
 
 #deck {
-    margin: 3vmax;
     width: var(--cardWidth);
     height: var(--cardHeight);
 
@@ -23,7 +29,6 @@ p {
 }
 
 #disposePile {
-    margin: 3vmax;
     width: var(--cardWidth);
     height: var(--cardHeight);
 }
@@ -38,7 +43,6 @@ p {
 }
 
 .hand {
-    margin: 2vmax;
     display: flex;
     gap: 1vmax;
 }
@@ -73,13 +77,22 @@ p {
     transform: translateY(20px);
 }
 
-.label {
+p.label {
     margin: auto;
     width: 50%;
-
     position: relative;
     top: -1.3vmax;
+}
 
+div.label {
+    width: 100%;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.label {
     font-size: 1.1vmax;
     font-weight: bold;
 }
@@ -116,6 +129,84 @@ p {
 }
 
 .gameCenter {
+    --cardScale: 0.9;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.gameCenter>div {
     display: flex;
     gap: 3vw;
+}
+
+#drawnCardContainer {
+    padding: 1vmax;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    gap: 2vh;
+}
+
+#drawnCard {
+    width: var(--cardWidth);
+    height: var(--cardHeight);
+
+    border-radius: 10px;
+    border: 2px solid black;
+    padding: 0.5vmax;
+}
+
+div:has(#ourHand) {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.hand.player1 {
+    --cardScale: 1;
+
+    rotate: -90deg;
+    position: fixed;
+    top: 19vmax;
+    right: -13vmax;
+}
+
+.hand.player2 {
+    --cardScale: 1;
+
+    rotate: 90deg;
+    position: fixed;
+    top: 19vmax;
+    left: -15vmax;
+}
+
+div:has(.hand.player3) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.hand.player3 {
+    rotate: 180deg;
 }
