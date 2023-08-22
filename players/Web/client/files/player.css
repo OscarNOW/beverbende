@@ -144,11 +144,12 @@ div.label {
 }
 
 .gameCenter>div {
+    transform: translateY(-2vmax);
     display: flex;
     gap: 3vw;
 }
 
-#drawnCardContainer {
+div:has(>div.label) {
     padding: 1vmax;
 
     display: flex;
@@ -167,6 +168,18 @@ div.label {
     padding: 0.5vmax;
 }
 
+#ourHand {
+    padding-top: 2vmax;
+    padding-left: 2vmax;
+    padding-right: 2vmax;
+    padding-bottom: 1vmax;
+
+    transform: translateY(-1vmax);
+
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
 div:has(#ourHand) {
     position: fixed;
     bottom: 0;
@@ -174,8 +187,13 @@ div:has(#ourHand) {
     right: 0;
 
     display: flex;
+    flex-direction: column;
     justify-content: space-around;
     align-items: center;
+}
+
+div:has(#ourHand)>.label {
+    transform: translateY(-1.5vmax);
 }
 
 .hand.player1 {
@@ -189,11 +207,10 @@ div:has(#ourHand) {
 
 .hand.player2 {
     --cardScale: 1;
-
     rotate: 90deg;
     position: fixed;
     top: 19vmax;
-    left: -15vmax;
+    left: -13vmax;
 }
 
 div:has(.hand.player3) {
