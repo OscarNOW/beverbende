@@ -37,6 +37,7 @@ function makeSelectable(element: HTMLElement, callback: () => void): void {
 };
 
 function chooseHandCard(): Promise<number> {
+    console.debug('chooseHandCard', 1);
     return new Promise(res => {
         makeOtherHandsNotSelectable();
         makeNotSelectable(document.getElementById('disposePileCard'));
@@ -45,6 +46,7 @@ function chooseHandCard(): Promise<number> {
         for (const cardIndex in activePlayer.hand) {
             makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
                 //todo-imp: remove the selectable classes on the elements
+                console.debug('chooseHandCard', 2, cardIndex);
                 res(parseInt(cardIndex));
             })
         };
