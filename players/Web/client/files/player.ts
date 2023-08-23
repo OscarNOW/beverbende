@@ -60,7 +60,6 @@ function makeNotSelectable(element: HTMLElement): void {
 }
 
 function chooseHandCard(): Promise<number> {
-    console.debug('chooseHandCard', 1);
     return new Promise(res => {
         makeOtherHandsNotSelectable();
         makeNotSelectable(document.getElementById('disposePileCard'));
@@ -69,7 +68,6 @@ function chooseHandCard(): Promise<number> {
         for (const cardIndex in activePlayer.hand) {
             makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
                 removeAllSelectorModifiers()
-                console.debug('chooseHandCard', 2, cardIndex);
                 res(parseInt(cardIndex));
             })
         };
