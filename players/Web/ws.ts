@@ -102,15 +102,21 @@ function performRequest(webPlayer: WebPlayer, requestType: requestType, ...args:
 
         const requestId = sendRequest(webPlayer, 'performAction', ...args);
         const { sockets } = webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id);
-        const listeners: ((givenRequestId: string, value: unknown) => void)[] = [];
+        const listeners: ((givenRequestType: requestType, givenRequestId: string, value: unknown) => void)[] = [];
 
         for (const socket of sockets) {
-            const listener = (givenRequestId: string, rawValue: string) => {
+            const listener = (givenRequestType: requestType, givenRequestId: string, rawValue: string) => {
+                console.log(0)
+                if (givenRequestType !== requestType) return;
+                console.log(1)
                 if (requestId !== givenRequestId) return;
+                console.log(2)
 
                 if (webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished)
                     throw new Error('Request already finished, but listener was not removed');
+                console.log(3)
                 webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished = true;
+                console.log(4)
 
                 for (const loopSocket of sockets) {
                     for (const loopListener of listeners)
@@ -120,11 +126,13 @@ function performRequest(webPlayer: WebPlayer, requestType: requestType, ...args:
                     else loopSocket.emit('requestCancel', requestId);
                 }
 
+                console.log(5)
                 const value = parse(rawValue);
+                console.log(6)
                 res(value);
             };
             listeners.push(listener);
-            socket.addListener(requestType, listener);
+            socket.addListener('request', listener);
         }
 
     });
