@@ -10,7 +10,7 @@
             "ES6",
             "DOM"
         ],
-        "incremental": true
+        "incremental": false
     },
     "lib": [
         "es2017",
