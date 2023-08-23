@@ -43,7 +43,7 @@ export function init(server: http.Server): void {
             socket.emit('initSuccess', stringify(webPlayer.activePlayer));
 
             setTimeout(() => {
-                for (const request of webPlayer.requests)
+                for (const request of webPlayer.requests) //todo-imp: also listen for requests when they send the result back
                     emitRequest(socket,
                         request.type,
                         request.requestId,
