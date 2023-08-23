@@ -82,17 +82,70 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
                 makeNotSelectable(document.getElementById('deck'));
 
                 makeSelectable(document.getElementById('disposePileCard'), () => {
+                    //todo-imp: remove the selectable classes on the elements
                     res({
                         // @ts-ignore //todo: remove this
-                        performer: givenActivePlayer,
+                        performer: activePlayer,
                         type: 'extraDraw',
                         drawnCardLocation: 'dispose',
                         drawnCard,
                         actions: []
                     });
                 });
-            } else {
-                //todo-imp
+            } else if (drawnCard.action === 'look') {
+                makeOtherHandsNotSelectable();
+                makeNotSelectable(document.getElementById('deck'));
+                makeNotSelectable(document.getElementById('disposePileCard'));
+
+                const ourHandCards = [...document.getElementById('ourHand').children].filter(a => a instanceof HTMLElement) as HTMLElement[];
+                for (const cardIndex in ourHandCards) {
+                    makeSelectable(ourHandCards[cardIndex], () => {
+                        //todo-imp: remove the selectable classes on the elements
+                        res({
+                            //@ts-ignore //todo: remove this
+                            performer: activePlayer,
+                            type: 'look',
+                            drawnCardLocation: 'dispose',
+                            drawnCard,
+                            cardSlot: activePlayer.hand[cardIndex]
+                        });
+                    });
+                }
+            } else if (drawnCard.action === 'switch') {
+                makeNotSelectable(document.getElementById('disposePileCard'));
+                makeNotSelectable(document.getElementById('deck'));
+
+                let ourHandIndex: number;
+
+                for (const cardIndex in activePlayer.hand) {
+                    makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
+                        //todo-imp: remove the selectable classes on the elements
+                        ourHandIndex = parseInt(cardIndex);
+                    })
+                };
+
+
+                makeNotSelectable(document.getElementById('disposePileCard'));
+                makeNotSelectable(document.getElementById('deck'));
+                makeOurHandNotSelectable();
+
+                for (const playerIndex in game.activePlayers.filter(a => a !== activePlayer)) {
+                    for (const cardIndex in game.activePlayers[playerIndex].hand) {
+                        makeSelectable(([...document.getElementById(`player${playerIndex + 1}hand`).children].filter(a => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
+                            //todo-imp: remove the selectable classes on the elements
+                            res({
+                                //@ts-ignore //todo: remove this
+                                performer: activePlayer,
+                                type: 'switch',
+                                drawnCardLocation: 'dispose',
+                                drawnCard,
+
+                                ownCardSlot: activePlayer.hand[ourHandIndex],
+                                otherCardSlot: game.activePlayers[playerIndex].hand[cardIndex]
+                            });
+                        })
+                    }
+                }
             }
         } else {
             //todo-imp
