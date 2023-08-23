@@ -147,7 +147,36 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
                 }
             }
         } else {
-            //todo-imp
+            //todo: use canDisposeValueCard
+
+            makeOtherHandsNotSelectable();
+            makeNotSelectable(document.getElementById('deck'));
+
+            makeSelectable(document.getElementById('disposePileCard'), () => {
+                //todo-imp: remove the selectable classes on the elements
+                res({
+                    //@ts-ignore //todo: remove this
+                    performer: activePlayer,
+                    type: 'dispose',
+                    drawnCardLocation: 'dispose',
+                    drawnCard
+                });
+            });
+
+            for (const cardIndex in activePlayer.hand) {
+                makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
+                    //todo-imp: remove the selectable classes on the elements
+                    res({
+                        //@ts-ignore //todo: remove this
+                        performer: activePlayer,
+                        type: 'use',
+                        drawnCardLocation: 'hand',
+                        disposedCard: drawnCard,
+
+                        cardSlot: activePlayer.hand[cardIndex]
+                    });
+                });
+            }
         }
     });
 };
