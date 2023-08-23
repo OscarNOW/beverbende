@@ -146,8 +146,8 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
 
                 for (const playerIndex in game.activePlayers.filter(a => a !== activePlayer)) {
                     for (const cardIndex in game.activePlayers[playerIndex].hand) {
-                        console.log(`player${playerIndex + 1}hand`)
-                        makeSelectable(([...document.getElementById(`player${playerIndex + 1}hand`).children].filter(a => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
+                        console.log(`player${parseInt(playerIndex) + 1}hand`)
+                        makeSelectable(([...document.getElementById(`player${parseInt(playerIndex) + 1}hand`).children].filter(a => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
                             removeAllSelectorModifiers()
                             res({
                                 //@ts-ignore //todo: remove this
