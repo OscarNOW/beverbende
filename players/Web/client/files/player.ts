@@ -26,6 +26,20 @@ function renderDrawnCard(drawnCard: Card): void {
     document.getElementById('drawnCardContainer').style.display = null;
 }
 
+const modifiedElements: HTMLElement[] = [];
+const modifiedElementListeners: Map<typeof modifiedElements[number], () => void> = new Map();
+
+function removeAllSelectorModifiers(): void {
+    for (const element of modifiedElements) {
+        element.classList.remove('not-selectable');
+        element.classList.remove('selectable');
+    }
+
+    for (const [element, listener] of modifiedElementListeners) //todo: test if this works
+        element.removeEventListener('click', listener);
+
+};
+
 function makeSelectable(element: HTMLElement, callback: () => void): void {
     const listener = () => {
         element.removeEventListener('click', listener);
@@ -33,9 +47,17 @@ function makeSelectable(element: HTMLElement, callback: () => void): void {
     };
 
     element.addEventListener('click', listener);
-    element.classList.remove('not-selectable');
     element.classList.add('selectable');
+
+    modifiedElementListeners.set(element, listener);
+    modifiedElements.push(element);
 };
+
+function makeNotSelectable(element: HTMLElement): void {
+    element.classList.add('not-selectable');
+
+    modifiedElements.push(element);
+}
 
 function chooseHandCard(): Promise<number> {
     console.debug('chooseHandCard', 1);
@@ -46,18 +68,13 @@ function chooseHandCard(): Promise<number> {
 
         for (const cardIndex in activePlayer.hand) {
             makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
-                //todo-imp: remove the selectable classes on the elements
+                removeAllSelectorModifiers()
                 console.debug('chooseHandCard', 2, cardIndex);
                 res(parseInt(cardIndex));
             })
         };
 
     });
-}
-
-function makeNotSelectable(element: HTMLElement): void {
-    element.classList.remove('selectable');
-    element.classList.add('not-selectable');
 }
 
 function makeOtherHandsNotSelectable(): void {
@@ -101,7 +118,7 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
                 makeNotSelectable(document.getElementById('deck'));
 
                 makeSelectable(document.getElementById('disposePileCard'), () => {
-                    //todo-imp: remove the selectable classes on the elements
+                    removeAllSelectorModifiers()
                     res({
                         // @ts-ignore //todo: remove this
                         performer: activePlayer,
@@ -131,7 +148,7 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
                     for (const cardIndex in game.activePlayers[playerIndex].hand) {
                         console.log(`player${playerIndex + 1}hand`)
                         makeSelectable(([...document.getElementById(`player${playerIndex + 1}hand`).children].filter(a => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
-                            //todo-imp: remove the selectable classes on the elements
+                            removeAllSelectorModifiers()
                             res({
                                 //@ts-ignore //todo: remove this
                                 performer: activePlayer,
@@ -153,7 +170,7 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
             makeNotSelectable(document.getElementById('deck'));
 
             makeSelectable(document.getElementById('disposePileCard'), () => {
-                //todo-imp: remove the selectable classes on the elements
+                removeAllSelectorModifiers()
                 res({
                     //@ts-ignore //todo: remove this
                     performer: activePlayer,
@@ -165,7 +182,7 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
 
             for (const cardIndex in activePlayer.hand) {
                 makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
-                    //todo-imp: remove the selectable classes on the elements
+                    removeAllSelectorModifiers()
                     res({
                         //@ts-ignore //todo: remove this
                         performer: activePlayer,
