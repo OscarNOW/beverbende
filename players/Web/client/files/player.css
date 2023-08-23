@@ -100,7 +100,9 @@ div.label {
 .selectable {
     cursor: pointer;
     filter: drop-shadow(0px 0px 59px #ffffff) brightness(1.2);
-    border: 7px solid #00ae00 !important;
+
+    border: 5px solid #00ae00 !important;
+    border-radius: 10px;
 }
 
 .not-selectable {
