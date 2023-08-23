@@ -20,7 +20,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
     init(id: string): void;
-    request(requestId: string, type: requestType, args: string): void;
+    request(requestId: string, type: requestType, value: string): void;
 }
 
 export interface InterServerEvents { }
