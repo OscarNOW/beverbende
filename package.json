@@ -13,8 +13,8 @@
     "build": "npm run ts && npm run copyOther",
     "start": "node --enable-source-maps dist/.",
     "ts": "npm run tsWeb && npm run tsNode",
-    "tsNode": "npx tsc --build tsconfig.json",
-    "tsWeb": "cd players/Web/client/ && npx tsc --build tsconfig.json && build.bat && cd ../../../",
+    "tsNode": "npx tsc --incremental",
+    "tsWeb": "cd players/Web/client/ && npx tsc tsconfig.json && build.bat && cd ../../../",
     "copyOther": "npx copyfiles -u 1 players/**/*.html players/**/*.css players/**/*.png dist/players/",
     "clean": "rimraf dist/"
   },
