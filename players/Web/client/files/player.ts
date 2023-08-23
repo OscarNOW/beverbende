@@ -11,7 +11,8 @@ function render(): void { //todo: export this function and make the Game call it
     const maxActivePlayers = 4;
     const activePlayerAmount = game.activePlayers.length;
 
-    if (activePlayerAmount > 4) throw new Error(`Max amount of ${maxActivePlayers} activePlayers implemented for the WebPlayer`);
+    if (activePlayerAmount > 4) throw new Error(`Max amount of ${maxActivePlayers} activePlayers implemented for the WebPlayer, current amount is ${activePlayerAmount}`);
+    if (game.handSize !== 4) throw new Error(`Only handSize of 4 is supported, current handSize is ${game.handSize}`);
 
     for (let ii = 1; ii < maxActivePlayers; ii++)
         if (activePlayerAmount > ii)
