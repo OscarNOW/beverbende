@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client'; // this import path gets magically replaced by a batch file at build time
 import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
 import { acceptExtraDrawCard, declareLastRound, performAction, cancel, init, state } from './player'; // this import path gets magically replaced by a batch file at build time
-import { parse } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
+import { parse, stringifyStrict as stringify } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
 import { ActivePlayer } from '../../../../src/statics';
 
 function waitForMessages<messages extends (keyof ServerToClientEvents | 'connect' | 'connect_error')[]>(
@@ -138,7 +138,7 @@ async function handlePendingRequests() {
         if (request.canceled)
             continue;
 
-        socket.emit('request', request.requestId, request.type, value);
+        socket.emit('request', request.requestId, request.type, stringify(value));
         //todo: remove eslint-disable and change eslint rule
         // eslint-disable-next-line no-unused-vars
         const [message, _, reason] = await waitForMessages(['requestSuccess', 'requestFail'], (message, messageRequestId, reason) => messageRequestId === request.requestId);

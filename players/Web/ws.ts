@@ -2,7 +2,7 @@ import http from 'http';
 import { Socket, Server as WsServer } from 'socket.io';
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, request, requestType } from './wsProtocol';
 import { Web as WebPlayer } from './index';
-import { stringifyStrict as stringify } from 'circular-json-es6';
+import { parse, stringifyStrict as stringify } from 'circular-json-es6';
 import { ActivePlayer } from '../../src/statics';
 
 const webPlayers: {
@@ -105,7 +105,7 @@ function performRequest(webPlayer: WebPlayer, requestType: requestType, ...args:
         const listeners: ((givenRequestId: string, value: unknown) => void)[] = [];
 
         for (const socket of sockets) {
-            const listener = (givenRequestId: string, value: unknown) => {
+            const listener = (givenRequestId: string, rawValue: string) => {
                 if (requestId !== givenRequestId) return;
 
                 if (webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished)
@@ -120,6 +120,7 @@ function performRequest(webPlayer: WebPlayer, requestType: requestType, ...args:
                     else loopSocket.emit('requestCancel', requestId);
                 }
 
+                const value = parse(rawValue);
                 res(value);
             };
             listeners.push(listener);
