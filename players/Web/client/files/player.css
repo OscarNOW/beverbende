@@ -104,7 +104,7 @@ div.label {
 
 .not-selectable {
     cursor: not-allowed;
-    filter: brightness(0.4) blur(2px);
+    filter: brightness(0.4) blur(1.3px);
 }
 
 #state {
