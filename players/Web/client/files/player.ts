@@ -36,6 +36,22 @@ function makeSelectable(element: HTMLElement, callback: () => void): void {
     element.classList.add('selectable');
 };
 
+function chooseHandCard(): Promise<number> {
+    return new Promise(res => {
+        makeOtherHandsNotSelectable();
+        makeNotSelectable(document.getElementById('disposePileCard'));
+        makeNotSelectable(document.getElementById('deck'));
+
+        for (const cardIndex in activePlayer.hand) {
+            makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
+                //todo-imp: remove the selectable classes on the elements
+                res(parseInt(cardIndex));
+            })
+        };
+
+    });
+}
+
 function makeNotSelectable(element: HTMLElement): void {
     element.classList.remove('selectable');
     element.classList.add('not-selectable');
@@ -74,7 +90,7 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
         game
     });
 
-    return new Promise(res => {
+    return new Promise(async res => {
         if (drawnCard.isActionCard) {
             if (drawnCard.action === 'extraDraw') {
                 makeOtherHandsNotSelectable();
@@ -93,37 +109,16 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
                     });
                 });
             } else if (drawnCard.action === 'look') {
-                makeOtherHandsNotSelectable();
-                makeNotSelectable(document.getElementById('deck'));
-                makeNotSelectable(document.getElementById('disposePileCard'));
-
-                const ourHandCards = [...document.getElementById('ourHand').children].filter(a => a instanceof HTMLElement) as HTMLElement[];
-                for (const cardIndex in ourHandCards) {
-                    makeSelectable(ourHandCards[cardIndex], () => {
-                        //todo-imp: remove the selectable classes on the elements
-                        res({
-                            //@ts-ignore //todo: remove this
-                            performer: activePlayer,
-                            type: 'look',
-                            drawnCardLocation: 'dispose',
-                            drawnCard,
-                            cardSlot: activePlayer.hand[cardIndex]
-                        });
-                    });
-                }
+                res({
+                    //@ts-ignore //todo: remove this
+                    performer: activePlayer,
+                    type: 'look',
+                    drawnCardLocation: 'dispose',
+                    drawnCard,
+                    cardSlot: activePlayer.hand[await chooseHandCard()]
+                });
             } else if (drawnCard.action === 'switch') {
-                makeNotSelectable(document.getElementById('disposePileCard'));
-                makeNotSelectable(document.getElementById('deck'));
-
-                let ourHandIndex: number;
-
-                for (const cardIndex in activePlayer.hand) {
-                    makeSelectable(([...document.getElementById('ourHand').children].filter((a: Element) => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
-                        //todo-imp: remove the selectable classes on the elements
-                        ourHandIndex = parseInt(cardIndex);
-                    })
-                };
-
+                const ourHandIndex = await chooseHandCard();
 
                 makeNotSelectable(document.getElementById('disposePileCard'));
                 makeNotSelectable(document.getElementById('deck'));
@@ -131,6 +126,7 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
 
                 for (const playerIndex in game.activePlayers.filter(a => a !== activePlayer)) {
                     for (const cardIndex in game.activePlayers[playerIndex].hand) {
+                        console.log(`player${playerIndex + 1}hand`)
                         makeSelectable(([...document.getElementById(`player${playerIndex + 1}hand`).children].filter(a => a instanceof HTMLElement) as HTMLElement[])[cardIndex], () => {
                             //todo-imp: remove the selectable classes on the elements
                             res({
