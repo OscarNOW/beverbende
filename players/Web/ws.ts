@@ -70,7 +70,7 @@ function emitRequest(socket: Socket<ClientToServerEvents, ServerToClientEvents, 
     )
 }
 
-function sendRequest(webPlayer: WebPlayer, type: requestType, ...args: unknown[]): string {
+function sendRequest(webPlayer: WebPlayer, requestType: requestType, ...args: unknown[]): string {
     if (!webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
         throw new Error(`webPlayer with id "${webPlayer.id}" not found`);
 
@@ -78,18 +78,42 @@ function sendRequest(webPlayer: WebPlayer, type: requestType, ...args: unknown[]
     const requestId = `${Math.floor(Math.random() * 10000)}`;
 
     requests.push({
-        type,
+        type: requestType,
         requestId,
         args,
         finished: false
     });
 
-    for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
+    for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets) {
         emitRequest(socket,
-            type,
+            requestType,
             requestId,
             args
         );
+
+        //todo: put this in a function
+        const listener = (givenRequestType: requestType, givenRequestId: string, rawValue: string) => {
+            if (givenRequestType !== requestType) return;
+            if (requestId !== givenRequestId) return;
+
+            if (webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished)
+                throw new Error('Request already finished, but listener was not removed');
+            webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished = true;
+
+            for (const loopSocket of webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id).sockets) {
+                for (const loopListener of listeners) //todo-imp: fix this
+                    loopSocket.removeListener(requestType, loopListener);
+
+                if (loopSocket === socket) loopSocket.emit('requestSuccess', requestId);
+                else loopSocket.emit('requestCancel', requestId);
+            }
+
+            const value = parse(rawValue);
+            res(value); //todo-imp: fix this
+        };
+        listeners.push(listener); //todo-imp: fix this
+        socket.on('request', listener);
+    }
 
     return requestId;
 }
