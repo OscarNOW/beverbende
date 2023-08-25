@@ -17,7 +17,7 @@ type request = {
     callback: (value: unknown) => void
 };
 
-const webPlayers: {
+const webPlayerInfos: {
     webPlayer: WebPlayer;
     activePlayer: ActivePlayer;
     sockets: typedSocket[];
@@ -34,35 +34,35 @@ export function init(server: http.Server): void {
 
     ws.on('connection', socket => {
         socket.on('init', id => {
-            const webPlayer = webPlayers.find(({ webPlayer }) => webPlayer.id === id);
-            if (!webPlayer) return socket.emit('initFail', 'invalidId');
+            const webPlayerInfo = webPlayerInfos.find(({ webPlayer }) => webPlayer.id === id);
+            if (!webPlayerInfo) return socket.emit('initFail', 'invalidId');
 
-            webPlayer.sockets.push(socket);
+            webPlayerInfo.sockets.push(socket);
             socket.on('disconnect', () => {
-                webPlayer.sockets.splice(webPlayer.sockets.indexOf(socket), 1);
+                webPlayerInfo.sockets.splice(webPlayerInfo.sockets.indexOf(socket), 1);
             });
 
             socket.on('request', (requestId: string) => {
-                if (!webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId))
+                if (!webPlayerInfo.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId))
                     return socket.emit('requestFail', requestId, 'invalidRequestId');
 
-                else if (webPlayer.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId).finished)
+                else if (webPlayerInfo.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId).finished)
                     return socket.emit('requestFail', requestId, 'requestCanceled');
 
                 else return; // there is a different handler that will handle this
             });
 
-            socket.emit('initSuccess', stringify(webPlayer.activePlayer));
+            socket.emit('initSuccess', stringify(webPlayerInfo.activePlayer));
 
             setTimeout(() => {
-                for (const request of webPlayer.requests) {
+                for (const request of webPlayerInfo.requests) {
                     emitRequest(socket,
                         request.type,
                         request.requestId,
                         request.args
                     );
 
-                    listenForRequest(socket, webPlayer.webPlayer, request.type, request.requestId);
+                    listenForRequest(socket, webPlayerInfo.webPlayer, request.type, request.requestId);
                 }
             }, 500);
         });
@@ -70,11 +70,11 @@ export function init(server: http.Server): void {
 }
 
 export function addPlayer(webPlayer: WebPlayer, activePlayer: ActivePlayer): void {
-    webPlayers.push({ webPlayer, activePlayer, sockets: [], requests: [] });
+    webPlayerInfos.push({ webPlayer, activePlayer, sockets: [], requests: [] });
 }
 
 export function removePlayer(removeWebPlayer: WebPlayer): void {
-    webPlayers.splice(webPlayers.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
+    webPlayerInfos.splice(webPlayerInfos.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
 }
 
 function emitRequest(socket: typedSocket, type: requestType, requestId: string, stringifyArgs: unknown[]) {
@@ -86,7 +86,7 @@ function emitRequest(socket: typedSocket, type: requestType, requestId: string, 
 }
 
 function listenForRequest(socket: typedSocket, webPlayer: WebPlayer, requestType: requestType, requestId: string): void {
-    const request = webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId);
+    const request = webPlayerInfos.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId);
 
     const listener = (givenRequestType: requestType, givenRequestId: string, rawValue: string) => {
         if (givenRequestType !== requestType) return;
@@ -113,10 +113,10 @@ function listenForRequest(socket: typedSocket, webPlayer: WebPlayer, requestType
 }
 
 function sendRequest(webPlayer: WebPlayer, requestType: requestType, callback: ((value: unknown) => void), ...args: unknown[]): string {
-    if (!webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
+    if (!webPlayerInfos.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
         throw new Error(`webPlayer with id "${webPlayer.id}" not found`);
 
-    const { requests } = webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id);
+    const { requests } = webPlayerInfos.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id);
     const requestId = `${Math.floor(Math.random() * 10000)}`;
 
     requests.push({
@@ -128,7 +128,7 @@ function sendRequest(webPlayer: WebPlayer, requestType: requestType, callback: (
         callback
     });
 
-    for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
+    for (const socket of webPlayerInfos.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
         emitRequest(socket,
             requestType,
             requestId,
@@ -141,11 +141,11 @@ function sendRequest(webPlayer: WebPlayer, requestType: requestType, callback: (
 function performRequest(webPlayer: WebPlayer, requestType: requestType, ...args: unknown[]): Promise<any> { //todo: type
     return new Promise(res => {
 
-        if (!webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
+        if (!webPlayerInfos.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
             throw new Error(`webPlayer with id "${webPlayer.id}" not found`);
 
         const requestId = sendRequest(webPlayer, 'performAction', res, ...args);
-        const { sockets } = webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id);
+        const { sockets } = webPlayerInfos.find(({ webPlayer: a }) => a.id === webPlayer.id);
 
         for (const socket of sockets)
             listenForRequest(socket, webPlayer, requestType, requestId);
