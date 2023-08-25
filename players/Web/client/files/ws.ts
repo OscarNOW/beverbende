@@ -1,8 +1,17 @@
 import { io, Socket } from 'socket.io-client'; // this import path gets magically replaced by a batch file at build time
-import { ServerToClientEvents, ClientToServerEvents, request as serverRequest, requestType } from '../../wsProtocol';
+import { ServerToClientEvents, ClientToServerEvents, requestType } from '../../wsProtocol';
 import { acceptExtraDrawCard, declareLastRound, performAction, cancel, init, state } from './player'; // this import path gets magically replaced by a batch file at build time
 import { parse, stringifyStrict as stringify } from 'circular-json-es6'; // this import path gets magically replaced by a batch file at build time
 import { ActivePlayer } from '../../../../src/statics';
+
+type request = {
+    type: requestType,
+    requestId: string,
+    args: unknown[],
+    started: boolean;
+    canceled: boolean;
+    cancel: null | (() => void);
+};
 
 function waitForMessages<messages extends (keyof ServerToClientEvents | 'connect' | 'connect_error')[]>(
     messages: messages,
@@ -40,12 +49,6 @@ function handleFatalError(type: 'initFail' | 'connectFail' | 'disconnect', reaso
     handleError(type, reason);
     socket.disconnect();
 }
-
-type request = Omit<serverRequest, 'finished'> & {
-    started: boolean;
-    canceled: boolean;
-    cancel: null | (() => void);
-};
 
 state('connecting');
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
