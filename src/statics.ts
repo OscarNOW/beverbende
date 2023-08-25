@@ -90,6 +90,7 @@ export class ActivePlayer {
     player: Player;
     hand: CardSlot<this>[];
     game: Game;
+    id: string;
 
     firstCardAtStart: this['privateInformationKeys'][number];
     lastCardAtStart: this['privateInformationKeys'][number];
@@ -104,6 +105,8 @@ export class ActivePlayer {
 
         this.privateInformationKeys = [];
         this.privateInformation = {} as privateInformation<this['privateInformationKeys']>;
+
+        this.id = `${Math.floor(Math.random() * 10000)}`;
 
         this.firstCardAtStart = this.addToPrivateInformation(firstCardAtStart);
         this.lastCardAtStart = this.addToPrivateInformation(lastCardAtStart);
