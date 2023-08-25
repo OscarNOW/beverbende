@@ -42,8 +42,8 @@ export function init(server: http.Server): void {
                 webPlayerInfo.sockets.splice(webPlayerInfo.sockets.indexOf(socket), 1);
             });
 
-            socket.on('request', (requestId: string) => {
-                if (!webPlayerInfo.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId))
+            socket.on('request', (requestId: string, requestType: requestType) => {
+                if (!webPlayerInfo.requests.find(({ requestId: checkRequestId, type: checkRequestType }) => checkRequestId === requestId && checkRequestType === requestType))
                     return socket.emit('requestFail', requestId, 'invalidRequestId');
 
                 else if (webPlayerInfo.requests.find(({ requestId: checkRequestId }) => checkRequestId === requestId).finished)
@@ -88,7 +88,7 @@ function emitRequest(socket: typedSocket, type: requestType, requestId: string, 
 function listenForRequest(socket: typedSocket, webPlayer: WebPlayer, requestType: requestType, requestId: string): void {
     const request = webPlayerInfos.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId);
 
-    const listener = (givenRequestType: requestType, givenRequestId: string, rawValue: string) => {
+    const listener = (givenRequestId: string, givenRequestType: requestType, rawValue: string) => {
         if (givenRequestType !== requestType) return;
         if (requestId !== givenRequestId) return;
 
