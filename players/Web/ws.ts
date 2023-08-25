@@ -1,14 +1,26 @@
 import http from 'http';
 import { Socket, Server as WsServer } from 'socket.io';
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, request, requestType } from './wsProtocol';
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData, requestType } from './wsProtocol';
 import { Web as WebPlayer } from './index';
 import { parse, stringifyStrict as stringify } from 'circular-json-es6';
 import { ActivePlayer } from '../../src/statics';
 
+type typedSocket = Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
+
+type requestListener = (givenRequestType: requestType, givenRequestId: string, value: unknown) => void;
+type request = {
+    type: requestType,
+    requestId: string,
+    finished: boolean,
+    args: unknown[],
+    listeners: Map<typedSocket, requestListener[]>,
+    callback: (value: unknown) => void
+};
+
 const webPlayers: {
     webPlayer: WebPlayer;
     activePlayer: ActivePlayer;
-    sockets: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>[];
+    sockets: typedSocket[];
     requests: request[];
 }[] = [];
 
@@ -43,12 +55,15 @@ export function init(server: http.Server): void {
             socket.emit('initSuccess', stringify(webPlayer.activePlayer));
 
             setTimeout(() => {
-                for (const request of webPlayer.requests) //todo-imp: also listen for requests when they send the result back
+                for (const request of webPlayer.requests) {
                     emitRequest(socket,
                         request.type,
                         request.requestId,
                         request.args
                     );
+
+                    listenForRequest(socket, webPlayer.webPlayer, request.type, request.requestId);
+                }
             }, 500);
         });
     });
@@ -62,7 +77,7 @@ export function removePlayer(removeWebPlayer: WebPlayer): void {
     webPlayers.splice(webPlayers.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
 }
 
-function emitRequest(socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, type: requestType, requestId: string, stringifyArgs: unknown[]) {
+function emitRequest(socket: typedSocket, type: requestType, requestId: string, stringifyArgs: unknown[]) {
     socket.emit('request',
         requestId,
         type,
@@ -70,7 +85,34 @@ function emitRequest(socket: Socket<ClientToServerEvents, ServerToClientEvents, 
     )
 }
 
-function sendRequest(webPlayer: WebPlayer, requestType: requestType, ...args: unknown[]): string {
+function listenForRequest(socket: typedSocket, webPlayer: WebPlayer, requestType: requestType, requestId: string): void {
+    const request = webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId);
+
+    const listener = (givenRequestType: requestType, givenRequestId: string, rawValue: string) => {
+        if (givenRequestType !== requestType) return;
+        if (requestId !== givenRequestId) return;
+
+        if (request.finished) throw new Error('Request already finished, but listener was not removed');
+        request.finished = true;
+
+        for (const [loopSocket, listeners] of request.listeners.entries()) {
+            for (const loopListener of listeners)
+                loopSocket.removeListener(requestType, loopListener);
+
+            if (loopSocket === socket) loopSocket.emit('requestSuccess', requestId);
+            else loopSocket.emit('requestCancel', requestId);
+        }
+
+        const value = parse(rawValue);
+        request.callback(value);
+    };
+
+    if (!request.listeners.has(socket)) request.listeners.set(socket, []);
+    request.listeners.get(socket).push(listener);
+    socket.on('request', listener);
+}
+
+function sendRequest(webPlayer: WebPlayer, requestType: requestType, callback: ((value: unknown) => void), ...args: unknown[]): string {
     if (!webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
         throw new Error(`webPlayer with id "${webPlayer.id}" not found`);
 
@@ -81,39 +123,17 @@ function sendRequest(webPlayer: WebPlayer, requestType: requestType, ...args: un
         type: requestType,
         requestId,
         args,
-        finished: false
+        finished: false,
+        listeners: new Map(),
+        callback
     });
 
-    for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets) {
+    for (const socket of webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).sockets)
         emitRequest(socket,
             requestType,
             requestId,
             args
         );
-
-        //todo: put this in a function
-        const listener = (givenRequestType: requestType, givenRequestId: string, rawValue: string) => {
-            if (givenRequestType !== requestType) return;
-            if (requestId !== givenRequestId) return;
-
-            if (webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished)
-                throw new Error('Request already finished, but listener was not removed');
-            webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished = true;
-
-            for (const loopSocket of webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id).sockets) {
-                for (const loopListener of listeners) //todo-imp: fix this
-                    loopSocket.removeListener(requestType, loopListener);
-
-                if (loopSocket === socket) loopSocket.emit('requestSuccess', requestId);
-                else loopSocket.emit('requestCancel', requestId);
-            }
-
-            const value = parse(rawValue);
-            res(value); //todo-imp: fix this
-        };
-        listeners.push(listener); //todo-imp: fix this
-        socket.on('request', listener);
-    }
 
     return requestId;
 }
@@ -124,33 +144,11 @@ function performRequest(webPlayer: WebPlayer, requestType: requestType, ...args:
         if (!webPlayers.find(({ webPlayer: checkWebPlayer }) => checkWebPlayer.id === webPlayer.id))
             throw new Error(`webPlayer with id "${webPlayer.id}" not found`);
 
-        const requestId = sendRequest(webPlayer, 'performAction', ...args);
+        const requestId = sendRequest(webPlayer, 'performAction', res, ...args);
         const { sockets } = webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id);
-        const listeners: ((givenRequestType: requestType, givenRequestId: string, value: unknown) => void)[] = [];
 
-        for (const socket of sockets) {
-            const listener = (givenRequestType: requestType, givenRequestId: string, rawValue: string) => {
-                if (givenRequestType !== requestType) return;
-                if (requestId !== givenRequestId) return;
-
-                if (webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished)
-                    throw new Error('Request already finished, but listener was not removed');
-                webPlayers.find(({ webPlayer: a }) => a.id === webPlayer.id).requests.find(({ requestId: a }) => a === requestId).finished = true;
-
-                for (const loopSocket of sockets) {
-                    for (const loopListener of listeners)
-                        loopSocket.removeListener(requestType, loopListener);
-
-                    if (loopSocket === socket) loopSocket.emit('requestSuccess', requestId);
-                    else loopSocket.emit('requestCancel', requestId);
-                }
-
-                const value = parse(rawValue);
-                res(value);
-            };
-            listeners.push(listener);
-            socket.on('request', listener);
-        }
+        for (const socket of sockets)
+            listenForRequest(socket, webPlayer, requestType, requestId);
 
     });
 }

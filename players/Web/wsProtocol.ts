@@ -1,11 +1,5 @@
 export const requestTypes = ['performAction', 'declareLastRound', 'acceptExtraDrawCard'] as const;
 export type requestType = typeof requestTypes[number];
-export type request = {
-    type: requestType,
-    requestId: string,
-    finished: boolean,
-    args: unknown[]
-};
 
 export interface ServerToClientEvents {
     initSuccess(activePlayer: string): void;
