@@ -146,9 +146,10 @@ export class Game {
 }
 
 async function createAction<canDisposeValueCard extends boolean>(game: Game, addDisposePileToDeck: Game['addDisposePileToDeck'], handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], drawnCard: Card, canDisposeValueCard: canDisposeValueCard): Promise<action<ActivePlayer, Card, canDisposeValueCard, 'finished'>> {
-    const newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
+    let newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>
         = await game.currentActivePlayer.performAction(drawnCard, canDisposeValueCard, game);
 
+    newAction = fixNewAction(game, newAction);
     //todo: verify that newAction is correct
 
     if (newAction.performer !== game.currentActivePlayer)
@@ -158,6 +159,16 @@ async function createAction<canDisposeValueCard extends boolean>(game: Game, add
     let finishedAction: action<ActivePlayer, Card, canDisposeValueCard, 'finished'> = await currentActionToFinished(game, addDisposePileToDeck, handCards, replaceHandCard, currentAction);
 
     return finishedAction;
+}
+
+function fixNewAction<canDisposeValueCard extends boolean>(game: Game, newAction: any): action<ActivePlayer, Card, canDisposeValueCard, 'new'> {
+    if (!(newAction.performer instanceof ActivePlayer))
+        if (game.activePlayers.find(({ id }) => id === newAction.performer.id))
+            newAction.performer = game.activePlayers.find(({ id }) => id === newAction.performer.id);
+
+    //todo: extend this function with (for example) CardSlot fixing
+
+    return newAction;
 }
 
 function newActionToCurrent<canDisposeValueCard extends boolean>(game: Game, handCards: Game['handCards'], replaceHandCard: Game['replaceHandCard'], newAction: action<ActivePlayer, Card, canDisposeValueCard, 'new'>, drawnCard: Card): action<ActivePlayer, Card, canDisposeValueCard, 'current'> {
