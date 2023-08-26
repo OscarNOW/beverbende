@@ -77,11 +77,11 @@ export function removePlayer(removeWebPlayer: WebPlayer): void {
     webPlayerInfos.splice(webPlayerInfos.findIndex(({ webPlayer }) => webPlayer === removeWebPlayer), 1);
 }
 
-function emitRequest(socket: typedSocket, type: requestType, requestId: string, stringifyArgs: unknown[]) {
+function emitRequest(socket: typedSocket, type: requestType, requestId: string, args: unknown[]) {
     socket.emit('request',
         requestId,
         type,
-        stringify(stringifyArgs)
+        stringify(args)
     )
 }
 
