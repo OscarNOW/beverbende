@@ -25,7 +25,7 @@ app.get('/player/:id', (req, res) => {
 });
 
 server.listen(port, () => {
-    console.log('Web player listening on port 4000')
+    console.log(`Web player listening on port ${port}`)
 });
 
 export const addPlayer = (webPlayer: WebPlayer, activePlayer: ActivePlayer): string => {
