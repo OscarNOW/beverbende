@@ -97,9 +97,6 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
     privateInformation = givenPrivateInformation;
     activePlayer = givenActivePlayer;
 
-    render();
-    renderDrawnCard(drawnCard);
-
     console.log('performAction', {
         drawnCard,
         canDisposeValueCard,
@@ -107,6 +104,9 @@ export function performAction<canDisposeValueCard extends boolean, activePlayer 
         privateInformation,
         game
     });
+
+    render();
+    renderDrawnCard(drawnCard);
 
     return new Promise(async res => {
         if (drawnCard.isActionCard) {
